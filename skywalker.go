@@ -1,5 +1,7 @@
 package skywalker
 
+import "fmt"
+
 const version = "1.0.0"
 
 type Skywalker struct {
@@ -19,6 +21,11 @@ func (c *Skywalker) New(rootPath string) error {
 		return err
 	}
 
+	err = c.checkDotEnv(rootPath)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -30,6 +37,14 @@ func (c *Skywalker) Init(p initPaths) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (c *Skywalker) checkDotEnv(path string) error {
+	err := c.CreateFileIfNotExist(fmt.Sprintf("%s/.env", path))
+	if err != nil {
+		return err
 	}
 	return nil
 }
