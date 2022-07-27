@@ -18,6 +18,12 @@ type Skywalker struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	config   config
+}
+
+type config struct {
+	port     string
+	renderer string
 }
 
 func (c *Skywalker) New(rootPath string) error {
@@ -47,12 +53,18 @@ func (c *Skywalker) New(rootPath string) error {
 	c.InfoLog = infoLog
 	c.ErrorLog = errorLog
 	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	c.Version = version 
+	c.Version = version
+	c.RootPath = rootPath
+
+	c.config = config{
+		port:     os.Getenv("PORT"),
+		renderer: os.Getenv("RENDERER"),
+	}
 
 	return nil
 }
 
-func (c *Skywalker) Init(p initPaths) error {
+func  (c *Skywalker) Init(p initPaths) error {
 	root := p.rootPath
 	for _, path := range p.folderNames {
 		// create a folder if it doesn't exist
