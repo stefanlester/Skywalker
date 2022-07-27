@@ -1,13 +1,23 @@
 package skywalker
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+
+	"github.com/joho/godotenv"
+)
 
 const version = "1.0.0"
 
 type Skywalker struct {
-	AppName string
-	Debug   bool
-	Version string
+	AppName  string
+	Debug    bool
+	Version  string
+	ErrorLog *log.Logger
+	InfoLog  *log.Logger
+	RootPath string
 }
 
 func (c *Skywalker) New(rootPath string) error {
@@ -25,6 +35,19 @@ func (c *Skywalker) New(rootPath string) error {
 	if err != nil {
 		return err
 	}
+
+	// read .env file
+	err = godotenv.Load(rootPath + "/.env")
+	if err != nil {
+		return err
+	}
+
+	// create loggers
+	infoLog, errorLog := c.startLoggers()
+	c.InfoLog = infoLog
+	c.ErrorLog = errorLog
+	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	c.Version = version 
 
 	return nil
 }
@@ -47,4 +70,14 @@ func (c *Skywalker) checkDotEnv(path string) error {
 		return err
 	}
 	return nil
+}
+
+func (c *Skywalker) startLoggers() (*log.Logger, *log.Logger) {
+	var infoLog *log.Logger
+	var errorLog *log.Logger
+
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
+	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+
+	return infoLog, errorLog
 }
