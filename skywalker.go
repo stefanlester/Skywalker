@@ -3,14 +3,19 @@ package skywalker
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/stefanlester/skywalker/vendor/github.com/go-chi/chi/v5"
 )
 
 const version = "1.0.0"
 
+// Skywalker is the overall type for the Skywalker package. Members that are exported in this type are
+// are available to any application that uses it
 type Skywalker struct {
 	AppName  string
 	Debug    bool
@@ -18,6 +23,7 @@ type Skywalker struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
 	RootPath string
+	Routes   *chi.Mux
 	config   config
 }
 
@@ -55,6 +61,7 @@ func (c *Skywalker) New(rootPath string) error {
 	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
 	c.Version = version
 	c.RootPath = rootPath
+	c.Routes = c.routes().(*chi.Mux)
 
 	c.config = config{
 		port:     os.Getenv("PORT"),
@@ -64,7 +71,8 @@ func (c *Skywalker) New(rootPath string) error {
 	return nil
 }
 
-func  (c *Skywalker) Init(p initPaths) error {
+// Init creates necessary folders for our Skywalker application
+func (c *Skywalker) Init(p initPaths) error {
 	root := p.rootPath
 	for _, path := range p.folderNames {
 		// create a folder if it doesn't exist
@@ -74,6 +82,24 @@ func  (c *Skywalker) Init(p initPaths) error {
 		}
 	}
 	return nil
+}
+
+// ListenAndServe starts the web server
+func (c *Skywalker) ListenAndServe() {
+	serve := &http.Server{
+		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
+		ErrorLog:     c.ErrorLog,
+		Handler:      c.routes(),
+		IdleTimeout:  30 * time.Second,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 600 * time.Second,
+	}
+
+	c.InfoLog.Printf("Starting server on port %s", os.Getenv("PORT"))
+	err := serve.ListenAndServe()
+	if err != nil {
+		c.ErrorLog.Fatal(err)
+	}
 }
 
 func (c *Skywalker) checkDotEnv(path string) error {
