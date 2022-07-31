@@ -1,6 +1,4 @@
 make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
-
 # GNU Make 4.3
 # Built for Windows32
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
@@ -8,12 +6,10 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Jul 29 19:29:14 2022
+# Make data base, printed on Sun Jul 31 16:36:10 2022
 
 # Variables
 
-# environment
-FPS_BROWSER_APP_PROFILE_STRING = Internet Explorer
 # environment
 SYSTEMDRIVE = C:
 # environment
@@ -39,9 +35,7 @@ GOPATH = C:\Users\VADER 1\go
 # automatic
 @D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
 # environment
-CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_8284_MDPAHZSZEFYKBHIO
-# environment
-FPS_BROWSER_USER_PROFILE_STRING = Default
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_17896_IDFZILYITRVPCHSC
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
@@ -53,7 +47,7 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = C:\Users\VADER 1\AppData\Roaming\Code - Insiders\CachedData\9cf2fabdd600c7d8e3230803acb246405321e8dd
+VSCODE_CODE_CACHE_PATH = C:\Users\VADER 1\AppData\Roaming\Code - Insiders\CachedData\12b08be500f8a307f30e92cbc3ee39ba115eab69
 # environment
 LANG = C
 # default
@@ -91,7 +85,7 @@ MAKEFILE_LIST :=
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 8284
+VSCODE_PID = 17896
 # automatic
 ?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
@@ -209,7 +203,7 @@ PROCESSOR_REVISION = a502
 # environment
 PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 2, GenuineIntel
 # variable set hash-table stats:
-# Load=98/1024=10%, Rehash=0, Collisions=9/122=7%
+# Load=96/1024=9%, Rehash=0, Collisions=8/120=7%
 
 # Pattern-specific Variable Values
 
@@ -282,6 +276,8 @@ GNUmakefile:
 # strcache performance: lookups = 23 / hit rate = 13%
 # hash-table stats:
 # Load=20/8192=0%, Rehash=0, Collisions=0/23=0%
-# Finished Make data base on Fri Jul 29 19:29:14 2022
+# Finished Make data base on Sun Jul 31 16:36:10 2022
 
  
+make: *** No rule to make target 'all'.  Stop.
+

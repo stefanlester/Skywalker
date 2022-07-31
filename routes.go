@@ -20,7 +20,7 @@ func (c *Skywalker) routes() http.Handler {
 	mux.Use(middleware.Recoverer)
 
 	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to SKYWALKER v%s", c.Version)
+		fmt.Fprint(w, "Welcome to SKYWALKER")
 	})
 	return mux
 }

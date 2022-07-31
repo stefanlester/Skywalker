@@ -97,9 +97,7 @@ func (c *Skywalker) ListenAndServe() {
 
 	c.InfoLog.Printf("Starting server on port %s", os.Getenv("PORT"))
 	err := serve.ListenAndServe()
-	if err != nil {
-		c.ErrorLog.Fatal(err)
-	}
+	c.ErrorLog.Fatal(err)
 }
 
 func (c *Skywalker) checkDotEnv(path string) error {
