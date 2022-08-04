@@ -59,7 +59,7 @@ func (c *Skywalker) New(rootPath string) error {
 	c.InfoLog = infoLog
 	c.ErrorLog = errorLog
 	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	c.Version = version
+	c.Version = version  
 	c.RootPath = rootPath
 	c.Routes = c.routes().(*chi.Mux)
 
