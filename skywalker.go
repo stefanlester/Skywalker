@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/stefanlester/skywalker/render"
 )
 
 const version = "1.0.0"
@@ -24,6 +25,7 @@ type Skywalker struct {
 	InfoLog  *log.Logger
 	RootPath string
 	Routes   *chi.Mux
+	Render   *render.Render // render is a pointer to the render package
 	config   config
 }
 
@@ -59,7 +61,7 @@ func (c *Skywalker) New(rootPath string) error {
 	c.InfoLog = infoLog
 	c.ErrorLog = errorLog
 	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	c.Version = version  
+	c.Version = version
 	c.RootPath = rootPath
 	c.Routes = c.routes().(*chi.Mux)
 
@@ -67,6 +69,8 @@ func (c *Skywalker) New(rootPath string) error {
 		port:     os.Getenv("PORT"),
 		renderer: os.Getenv("RENDERER"),
 	}
+
+	c.Render = c.createRenderer(c)
 
 	return nil
 }
@@ -116,4 +120,15 @@ func (c *Skywalker) startLoggers() (*log.Logger, *log.Logger) {
 	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
 	return infoLog, errorLog
+}
+
+func (c *Skywalker) createRenderer(skywalker *Skywalker) *render.Render {
+	myRenderer := render.Render{
+		Renderer: skywalker.config.renderer,
+		RootPath: skywalker.RootPath,
+		Port:     skywalker.config.port,
+	}
+
+	return &myRenderer
+
 }

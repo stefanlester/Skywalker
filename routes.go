@@ -1,7 +1,6 @@
 package skywalker
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -19,9 +18,5 @@ func (c *Skywalker) routes() http.Handler {
 
 	mux.Use(middleware.Recoverer)
 
-	mux.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Welcome to SKYWALKER")
-	})
-	
 	return mux
 }
