@@ -19,7 +19,7 @@ type TemplateData struct {
 	IsAuthenticated bool
 	IntMap          map[string]int
 	StringMap       map[string]string
-	FloatMap        map[string]float64
+	FloatMap        map[string]float32
 	Data            map[string]interface{}
 	CSRFToken       string
 	Port            string
