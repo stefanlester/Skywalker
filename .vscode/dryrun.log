@@ -1,6 +1,6 @@
-make.exe --dry-run --always-make --keep-going --print-directory
-make: Entering directory 'c:/Users/VADER 1/Desktop/SKYWALKER/skywalker'
-make: Leaving directory 'c:/Users/VADER 1/Desktop/SKYWALKER/skywalker'
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/stefanlester/Documents/skywalker'
+make: Leaving directory '/home/stefanlester/Documents/skywalker'
  
 make: *** No targets specified and no makefile found.  Stop.
 

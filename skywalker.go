@@ -70,7 +70,7 @@ func (c *Skywalker) New(rootPath string) error {
 		renderer: os.Getenv("RENDERER"),
 	}
 
-	c.Render = c.createRenderer(c)
+	c.createRenderer()
 
 	return nil
 }
@@ -122,13 +122,12 @@ func (c *Skywalker) startLoggers() (*log.Logger, *log.Logger) {
 	return infoLog, errorLog
 }
 
-func (c *Skywalker) createRenderer(skywalker *Skywalker) *render.Render {
+func (c *Skywalker) createRenderer() {
 	myRenderer := render.Render{
-		Renderer: skywalker.config.renderer,
-		RootPath: skywalker.RootPath,
-		Port:     skywalker.config.port,
+		Renderer: c.config.renderer,
+		RootPath: c.RootPath,
+		Port:     c.config.port,
 	}
 
-	return &myRenderer
-
+	c.Render = &myRenderer
 }
