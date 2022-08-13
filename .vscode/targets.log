@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Fri Aug 12 16:50:01 2022
+# Make data base, printed on Sat Aug 13 14:03:10 2022
 
 # Variables
 
@@ -57,7 +57,7 @@ VSCODE_CODE_CACHE_PATH = /home/stefanlester/.config/Code/CachedData/3b889b090b5a
 # environment
 LANG = C
 # environment
-XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.OHLLQ1
+XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.6CZKQ1
 # default
 .LOADED := 
 # default
@@ -91,13 +91,13 @@ MAKEFILE_LIST :=
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 171855
+VSCODE_PID = 7093
 # environment
 XDG_SESSION_TYPE = wayland
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # environment
-SESSION_MANAGER = local/unix:@/tmp/.ICE-unix/1729,unix/unix:/tmp/.ICE-unix/1729
+SESSION_MANAGER = local/unix:@/tmp/.ICE-unix/1833,unix/unix:/tmp/.ICE-unix/1833
 # automatic
 *F = $(notdir $*)
 # environment
@@ -131,7 +131,7 @@ MAKEFILES :=
 # automatic
 ^F = $(notdir $^)
 # environment
-INVOCATION_ID = 4628fe1a87a94dd7a501b810633d6c10
+INVOCATION_ID = 8c3a37114f7e4c679b8c937e50596fea
 # environment
 USERNAME = stefanlester
 # environment
@@ -155,7 +155,7 @@ GIO_LAUNCHED_DESKTOP_FILE = /usr/share/applications/code.desktop
 # makefile
 .DEFAULT_GOAL := 
 # environment
-SYSTEMD_EXEC_PID = 1781
+SYSTEMD_EXEC_PID = 1886
 # environment
 HISTCONTROL = ignoredups
 # environment
@@ -167,13 +167,13 @@ USER = stefanlester
 # default
 MAKE_VERSION := 4.3
 # environment
-MANAGERPID = 1595
+MANAGERPID = 1699
 # environment
 which_declare = declare -f
 # environment
 DEBUGINFOD_URLS = https://debuginfod.fedoraproject.org/ 
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 171855
+GIO_LAUNCHED_DESKTOP_FILE_PID = 7093
 # environment
 _ = /usr/bin/make
 # environment
@@ -181,7 +181,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 GOMODCACHE = /home/stefanlester/go/pkg/mod
 # environment
-JOURNAL_STREAM = 8:34947
+JOURNAL_STREAM = 8:28484
 # environment
 XDG_SESSION_CLASS = user
 # environment
@@ -275,7 +275,7 @@ GNUmakefile:
 # strcache performance: lookups = 25 / hit rate = 12%
 # hash-table stats:
 # Load=22/8192=0%, Rehash=0, Collisions=0/25=0%
-# Finished Make data base on Fri Aug 12 16:50:01 2022
+# Finished Make data base on Sat Aug 13 14:03:10 2022
 
  
 make: *** No rule to make target 'all'.  Stop.
