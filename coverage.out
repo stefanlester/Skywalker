@@ -1,0 +1,22 @@
+mode: set
+github.com/stefanlester/skywalker/render/render.go:35.111,36.37 1 1
+github.com/stefanlester/skywalker/render/render.go:42.2,42.52 1 1
+github.com/stefanlester/skywalker/render/render.go:37.12,38.36 1 1
+github.com/stefanlester/skywalker/render/render.go:39.13,40.48 1 1
+github.com/stefanlester/skywalker/render/render.go:46.102,48.16 2 1
+github.com/stefanlester/skywalker/render/render.go:52.2,53.17 2 1
+github.com/stefanlester/skywalker/render/render.go:57.2,58.16 2 1
+github.com/stefanlester/skywalker/render/render.go:62.2,62.12 1 1
+github.com/stefanlester/skywalker/render/render.go:48.16,50.3 1 1
+github.com/stefanlester/skywalker/render/render.go:53.17,55.3 1 0
+github.com/stefanlester/skywalker/render/render.go:58.16,60.3 1 0
+github.com/stefanlester/skywalker/render/render.go:66.122,69.22 2 1
+github.com/stefanlester/skywalker/render/render.go:75.2,76.17 2 1
+github.com/stefanlester/skywalker/render/render.go:80.2,81.16 2 1
+github.com/stefanlester/skywalker/render/render.go:86.2,86.47 1 1
+github.com/stefanlester/skywalker/render/render.go:91.2,91.12 1 1
+github.com/stefanlester/skywalker/render/render.go:69.22,71.3 1 1
+github.com/stefanlester/skywalker/render/render.go:71.8,73.3 1 0
+github.com/stefanlester/skywalker/render/render.go:76.17,78.3 1 0
+github.com/stefanlester/skywalker/render/render.go:81.16,84.3 2 1
+github.com/stefanlester/skywalker/render/render.go:86.47,89.3 2 0
