@@ -8,6 +8,7 @@ import (
 )
 
 func (c *Skywalker) routes() http.Handler {
+	// middleware
 	mux := chi.NewRouter()
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.RealIP)
@@ -17,6 +18,7 @@ func (c *Skywalker) routes() http.Handler {
 	}
 
 	mux.Use(middleware.Recoverer)
+	mux.Use(c.SessionLoad)
 
 	return mux
 }

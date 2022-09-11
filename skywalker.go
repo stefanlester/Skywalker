@@ -80,6 +80,7 @@ func (c *Skywalker) New(rootPath string) error {
 			lifetime: os.Getenv("COOKIE_LIFETIME"),
 			persist:  os.Getenv("COOKIE_PERSIST"),
 			secure:   os.Getenv("COOKIE_SECURE"),
+			domain:   os.Getenv("COOKIE_DOMAIN"),
 		},
 		sessionType: os.Getenv("SESSION_TYPE"),
 	}
@@ -87,9 +88,10 @@ func (c *Skywalker) New(rootPath string) error {
 	// create session manager
 	session := session.Session{
 		CookieLifetime: c.config.cookie.lifetime,
-		CookiePersist: c.config.cookie.persist,
-		CookieName: c.config.cookie.name,
-		SessionType: c.config.sessionType,
+		CookiePersist:  c.config.cookie.persist,
+		CookieName:     c.config.cookie.name,
+		SessionType:    c.config.sessionType,
+		CookieDomain:  c.config.cookie.domain,
 	}
 
 	c.Session = session.InitSession()
