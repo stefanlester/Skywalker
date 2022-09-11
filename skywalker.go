@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/CloudyKit/jet/v6"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
 	"github.com/stefanlester/skywalker/render"
+	"github.com/stefanlester/skywalker/session"
 )
 
 const version = "1.0.0"
@@ -27,13 +29,16 @@ type Skywalker struct {
 	RootPath string
 	Routes   *chi.Mux
 	Render   *render.Render // render is a pointer to the render package
+	Session  *scs.SessionManager
 	JetViews *jet.Set
 	config   config
 }
 
 type config struct {
-	port     string
-	renderer string
+	port        string
+	renderer    string
+	cookie      cookieConfig
+	sessionType string
 }
 
 func (c *Skywalker) New(rootPath string) error {
@@ -70,7 +75,24 @@ func (c *Skywalker) New(rootPath string) error {
 	c.config = config{
 		port:     os.Getenv("PORT"),
 		renderer: os.Getenv("RENDERER"),
+		cookie: cookieConfig{
+			name:     os.Getenv("COOKIE_NAME"),
+			lifetime: os.Getenv("COOKIE_LIFETIME"),
+			persist:  os.Getenv("COOKIE_PERSIST"),
+			secure:   os.Getenv("COOKIE_SECURE"),
+		},
+		sessionType: os.Getenv("SESSION_TYPE"),
 	}
+
+	// create session manager
+	session := session.Session{
+		CookieLifetime: c.config.cookie.lifetime,
+		CookiePersist: c.config.cookie.persist,
+		CookieName: c.config.cookie.name,
+		SessionType: c.config.sessionType,
+	}
+
+	c.Session = session.InitSession()
 
 	var views = jet.NewSet(
 		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),

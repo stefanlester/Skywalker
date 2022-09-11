@@ -1,4 +1,6 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
 # GNU Make 4.3
 # Built for x86_64-redhat-linux-gnu
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
@@ -6,7 +8,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Aug 27 18:35:08 2022
+# Make data base, printed on Sun Sep 11 16:08:47 2022
 
 # Variables
 
@@ -47,7 +49,7 @@ HOSTNAME = fedora
 # environment
 MAIL = /var/spool/mail/stefanlester
 # environment
-XDG_DATA_DIRS = /home/stefanlester/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share/:/usr/share/
+XDG_DATA_DIRS = /home/stefanlester/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
 # automatic
 ^D = $(patsubst %/,%,$(dir $^))
 # automatic
@@ -57,7 +59,7 @@ VSCODE_CODE_CACHE_PATH = /home/stefanlester/.config/Code/CachedData/3b889b090b5a
 # environment
 LANG = C
 # environment
-XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.PF9FR1
+XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.NFJ0R1
 # default
 .LOADED := 
 # default
@@ -86,18 +88,18 @@ HISTSIZE = 1000
 +D = $(patsubst %/,%,$(dir $+))
 # environment
 XDG_SESSION_DESKTOP = gnome
-# makefile
-MAKEFILE_LIST := 
+# makefile (from 'Makefile', line 1)
+MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 19854
+VSCODE_PID = 7314
 # environment
 XDG_SESSION_TYPE = wayland
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # environment
-SESSION_MANAGER = local/unix:@/tmp/.ICE-unix/1858,unix/unix:/tmp/.ICE-unix/1858
+SESSION_MANAGER = local/unix:@/tmp/.ICE-unix/1995,unix/unix:/tmp/.ICE-unix/1995
 # automatic
 *F = $(notdir $*)
 # environment
@@ -125,13 +127,13 @@ MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = /home/stefanlester/.local/bin:/home/stefanlester/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
+PATH = /home/stefanlester/.local/bin:/home/stefanlester/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/var/lib/snapd/snap/bin
 # default
 MAKEFILES := 
 # automatic
 ^F = $(notdir $^)
 # environment
-INVOCATION_ID = d3f98b443c6141bc8baa9e757c9a0a28
+INVOCATION_ID = 205a029b292f46afb0e8bfb91bb49be7
 # environment
 USERNAME = stefanlester
 # environment
@@ -153,9 +155,9 @@ LOGNAME = stefanlester
 # environment
 GIO_LAUNCHED_DESKTOP_FILE = /usr/share/applications/code.desktop
 # makefile
-.DEFAULT_GOAL := 
+.DEFAULT_GOAL := test
 # environment
-SYSTEMD_EXEC_PID = 1907
+SYSTEMD_EXEC_PID = 2048
 # environment
 HISTCONTROL = ignoredups
 # environment
@@ -167,13 +169,13 @@ USER = stefanlester
 # default
 MAKE_VERSION := 4.3
 # environment
-MANAGERPID = 1645
+MANAGERPID = 1860
 # environment
 which_declare = declare -f
 # environment
 DEBUGINFOD_URLS = https://debuginfod.fedoraproject.org/ 
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 19854
+GIO_LAUNCHED_DESKTOP_FILE_PID = 7314
 # environment
 _ = /usr/bin/make
 # environment
@@ -181,7 +183,7 @@ XDG_RUNTIME_DIR = /run/user/1000
 # environment
 GOMODCACHE = /home/stefanlester/go/pkg/mod
 # environment
-JOURNAL_STREAM = 8:31446
+JOURNAL_STREAM = 8:34281
 # environment
 XDG_SESSION_CLASS = user
 # environment
@@ -209,7 +211,7 @@ XDG_MENU_PREFIX = gnome-
 # environment
 GDMSESSION = gnome
 # variable set hash-table stats:
-# Load=97/1024=9%, Rehash=0, Collisions=4/124=3%
+# Load=97/1024=9%, Rehash=0, Collisions=4/127=3%
 
 # Pattern-specific Variable Values
 
@@ -217,9 +219,9 @@ GDMSESSION = gnome
 
 # Directories
 
-# . (device 41, inode 448035): 14 files, no impossibilities.
+# . (device 40, inode 448035): 17 files, no impossibilities.
 
-# 14 files, no impossibilities in 1 directories.
+# 17 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -227,12 +229,33 @@ GDMSESSION = gnome
 
 # Files
 
+coverage:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 11):
+	@go test -cover ./...
+
+cover:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 7):
+	@go test -coverprofile=coverage.out ./... && go tool cover -html=coverage.out
+
+build_cli:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 15):
+	@go build -o ../myapp/celeritas ./cmd/cli
+
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  File does not exist.
+#  Last modified 2022-08-27 19:26:05.760814389
 #  File has been updated.
-#  Failed to be updated.
+#  Successfully updated.
 
 # Not a target:
 .DEFAULT:
@@ -247,36 +270,28 @@ all:
 #  File does not exist.
 #  File has not been updated.
 
-# Not a target:
-makefile:
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
-
-# Not a target:
-GNUmakefile:
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
+test:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'Makefile', line 3):
+	@go test -v ./...
 
 # files hash-table stats:
-# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/18=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 22 / storage = 199 B / avg = 9 B
-# current buf: size = 8162 B / used = 199 B / count = 22 / avg = 9 B
+# strcache buffers: 1 (0) / strings = 26 / storage = 229 B / avg = 8 B
+# current buf: size = 8162 B / used = 229 B / count = 26 / avg = 8 B
 
-# strcache performance: lookups = 25 / hit rate = 12%
+# strcache performance: lookups = 34 / hit rate = 23%
 # hash-table stats:
-# Load=22/8192=0%, Rehash=0, Collisions=0/25=0%
-# Finished Make data base on Sat Aug 27 18:35:08 2022
+ 
+# Load=26/8192=0%, Rehash=0, Collisions=0/34=0%
+# Finished Make data base on Sun Sep 11 16:08:47 2022
 
  
-make: *** No rule to make target 'all'.  Stop.
-
