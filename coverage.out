@@ -1,4 +1,17 @@
 mode: set
+github.com/stefanlester/skywalker/session/session.go:21.53,26.16 3 1
+github.com/stefanlester/skywalker/session/session.go:31.2,31.48 1 1
+github.com/stefanlester/skywalker/session/session.go:36.2,36.48 1 1
+github.com/stefanlester/skywalker/session/session.go:43.2,52.40 8 1
+github.com/stefanlester/skywalker/session/session.go:62.2,62.16 1 1
+github.com/stefanlester/skywalker/session/session.go:26.16,28.3 1 0
+github.com/stefanlester/skywalker/session/session.go:31.48,33.3 1 1
+github.com/stefanlester/skywalker/session/session.go:36.48,38.3 1 0
+github.com/stefanlester/skywalker/session/session.go:38.8,40.3 1 1
+github.com/stefanlester/skywalker/session/session.go:53.15,53.15 0 0
+github.com/stefanlester/skywalker/session/session.go:55.26,55.26 0 0
+github.com/stefanlester/skywalker/session/session.go:57.32,57.32 0 0
+github.com/stefanlester/skywalker/session/session.go:59.10,59.10 0 1
 github.com/stefanlester/skywalker/render/render.go:35.111,36.37 1 1
 github.com/stefanlester/skywalker/render/render.go:42.2,42.52 1 1
 github.com/stefanlester/skywalker/render/render.go:37.12,38.36 1 1

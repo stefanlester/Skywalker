@@ -1,217 +1,215 @@
-make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make.exe all --print-data-base --no-builtin-variables --no-builtin-rules --question
 make: *** No rule to make target 'all'.  Stop.
 
 # GNU Make 4.3
-# Built for x86_64-redhat-linux-gnu
+# Built for Windows32
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
 # License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun Sep 11 16:08:47 2022
+# Make data base, printed on Wed Oct 26 16:35:35 2022
 
 # Variables
 
 # environment
-GDK_BACKEND = x11
+SYSTEMDRIVE = C:
 # environment
 LC_ALL = C
 # environment
-NO_AT_BRIDGE = 1
+ACSVCPORT = 17532
 # environment
-GJS_DEBUG_OUTPUT = stderr
+USERPROFILE = C:\Users\VADER 1
 # environment
-VSCODE_CWD = /home/stefanlester
+LOCALAPPDATA = C:\Users\VADER 1\AppData\Local
 # environment
-GDM_LANG = en_US.UTF-8
+VSCODE_CWD = C:\WINDOWS\system32
+# environment
+CHOCOLATEYINSTALL = C:\ProgramData\chocolatey
+# environment
+SYSTEMROOT = C:\WINDOWS
+# environment
+PROCESSOR_LEVEL = 6
+# environment
+PSMODULEPATH = %ProgramFiles%\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
 # default
-MAKE_COMMAND := make
+MAKE_COMMAND := C:/ProgramData/chocolatey/lib/make/tools/install/bin/make.exe
 # environment
-GOPATH = /home/stefanlester/go
-# environment
-define BASH_FUNC_which%%
-() {  ( alias;
- eval ${which_declare} ) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
-}
-endef
+GOPATH = C:\Users\VADER 1\go
 # automatic
-@D = $(patsubst %/,%,$(dir $@))
+@D = $(patsubst %/,%,$(patsubst %\,%,$(dir $@)))
+# environment
+CHROME_CRASHPAD_PIPE_NAME = \\.\pipe\crashpad_20096_ZNWUNKJLHQZKXGGX
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # default
 .VARIABLES := 
-# environment
-PWD = /home/stefanlester/Documents/skywalker
 # automatic
-%D = $(patsubst %/,%,$(dir $%))
-# environment
-HOSTNAME = fedora
-# environment
-MAIL = /var/spool/mail/stefanlester
-# environment
-XDG_DATA_DIRS = /home/stefanlester/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop
+%D = $(patsubst %/,%,$(patsubst %\,%,$(dir $%)))
 # automatic
-^D = $(patsubst %/,%,$(dir $^))
+^D = $(patsubst %/,%,$(patsubst %\,%,$(dir $^)))
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = /home/stefanlester/.config/Code/CachedData/3b889b090b5ad5793f524b5d1d39fda662b96a2a
+VSCODE_CODE_CACHE_PATH = C:\Users\VADER 1\AppData\Roaming\Code - Insiders\CachedData\a803dc359aa1ed48c7acf074dd81d6af1525c8c8
 # environment
 LANG = C
-# environment
-XAUTHORITY = /run/user/1000/.mutter-Xwaylandauth.NFJ0R1
 # default
 .LOADED := 
+# environment
+TMP = C:\Users\VADER 1\AppData\Local\Temp
 # default
-.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+.INCLUDE_DIRS = .
+# environment
+PROCESSOR_ARCHITEW6432 = AMD64
 # makefile
 MAKEFLAGS = pqrR
+# environment
+ONEDRIVE = C:\Users\VADER 1\OneDrive
 # makefile
-CURDIR := /home/stefanlester/Documents/skywalker
+CURDIR := c:/Users/VADER 1/Desktop/SKYWALKER/skywalker
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
-# environment
-LESSOPEN = ||/usr/bin/lesspipe.sh %s
 # automatic
-*D = $(patsubst %/,%,$(dir $*))
+*D = $(patsubst %/,%,$(patsubst %\,%,$(dir $*)))
+# environment
+PROGRAMFILES = C:\Program Files (x86)
+# environment
+WALLABY_PRODUCTION = true
 # environment
 MFLAGS = -pqrR
-# environment
-SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
 # default
 .SHELLFLAGS := -c
 # environment
-WAYLAND_DISPLAY = wayland-0
-# environment
-HISTSIZE = 1000
+COMMONPROGRAMW6432 = C:\Program Files\Common Files
 # automatic
-+D = $(patsubst %/,%,$(dir $+))
-# environment
-XDG_SESSION_DESKTOP = gnome
++D = $(patsubst %/,%,$(patsubst %\,%,$(dir $+)))
 # makefile (from 'Makefile', line 1)
 MAKEFILE_LIST := Makefile
 # automatic
 @F = $(notdir $@)
 # environment
-VSCODE_PID = 7314
-# environment
-XDG_SESSION_TYPE = wayland
+VSCODE_PID = 20096
 # automatic
-?D = $(patsubst %/,%,$(dir $?))
-# environment
-SESSION_MANAGER = local/unix:@/tmp/.ICE-unix/1995,unix/unix:/tmp/.ICE-unix/1995
+?D = $(patsubst %/,%,$(patsubst %\,%,$(dir $?)))
 # automatic
 *F = $(notdir $*)
-# environment
-CHROME_DESKTOP = code-url-handler.desktop
-# environment
-DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # automatic
-<D = $(patsubst %/,%,$(dir $<))
+<D = $(patsubst %/,%,$(patsubst %\,%,$(dir $<)))
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-us","availableLanguages":{},"_languagePackSupport":true}
+# environment
+ONEDRIVECONSUMER = C:\Users\VADER 1\OneDrive
 # default
-MAKE_HOST := x86_64-redhat-linux-gnu
-# makefile
-SHELL = /bin/sh
+MAKE_HOST := Windows32
+# environment
+PROGRAMDATA = C:\ProgramData
+# default
+SHELL := sh.exe
+# environment
+HOMEPATH = \Users\VADER 1
 # default
 MAKECMDGOALS := all
 # environment
-XMODIFIERS = @im=ibus
+ACSETUPSVCPORT = 23210
 # environment
-GJS_DEBUG_TOPICS = JS ERROR;JS LOG
+DRIVERDATA = C:\Windows\System32\Drivers\DriverData
 # environment
-SHLVL = 0
+COMSPEC = C:\WINDOWS\system32\cmd.exe
+# environment
+WEBSTORM = C:\Program Files\JetBrains\WebStorm 2021.1\bin;
+# environment
+WINDIR = C:\WINDOWS
 # environment
 MAKELEVEL := 0
 # default
 MAKE = $(MAKE_COMMAND)
 # environment
-PATH = /home/stefanlester/.local/bin:/home/stefanlester/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/var/lib/snapd/snap/bin
+PATH = C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;C:\Users\VADER 1\AppData\Local\Programs\Python\Python37;C:\Users\VADER 1\AppData\Local\Programs\Python\Python37\Scripts;;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Users\VADER 1\AppData\Local\Programs\Python\Python37\Scripts\;C:\Users\VADER 1\AppData\Local\Programs\Python\Python37\;C:\Users\VADER 1\AppData\Local\Microsoft\WindowsApps;C:\Users\VADER 1\AppData\Roaming\npm;C:\Users\VADER 1\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\VADER 1\AppData\Local\Programs\Hyper\resources\bin;C:\Program Files\JetBrains\WebStorm 2021.1\bin;C:\Users\VADER 1\AppData\Local\GitHubDesktop\bin;C:\Users\VADER ;C:\Program Files\Go\bin;C:\Program Files\dotnet\;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SYSTEMROOT%\System32\WindowsPowerShell\v1.0\;%SYSTEMROOT%\System32\OpenSSH\;C:\Users\VADER 1\AppData\Local\atom\bin;C:\Users\VADER 1\AppData\Local\Programs\Microsoft VS Code Insiders\bin;C:\Users\VADER 1\AppData\Local\gitkraken\bin;C:\Users\VADER 1\go\bin
+# environment
+ZES_ENABLE_SYSMAN = 1
+# environment
+COMPUTERNAME = OMEN-BY-HP
 # default
 MAKEFILES := 
 # automatic
 ^F = $(notdir $^)
 # environment
-INVOCATION_ID = 205a029b292f46afb0e8bfb91bb49be7
+PROMPT = $P$G
 # environment
-USERNAME = stefanlester
+CHOCOLATEYLASTPATHUPDATE = 132831444599325839
 # environment
-GNOME_SETUP_DISPLAY = :1
+LOGONSERVER = \\OMEN-BY-HP
+# environment
+USERNAME = VADER 1
+# environment
+COMMONPROGRAMFILES = C:\Program Files (x86)\Common Files
 # automatic
 ?F = $(notdir $?)
 # environment
-XDG_CURRENT_DESKTOP = GNOME
+PROGRAMW6432 = C:\Program Files
+# environment
+PATHEXT = .COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
 # automatic
 +F = $(notdir $+)
 # environment
-DESKTOP_SESSION = gnome
+ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
-ORIGINAL_XDG_CURRENT_DESKTOP = GNOME
+USERDOMAIN = OMEN-BY-HP
 # 'override' directive
 GNUMAKEFLAGS := 
 # environment
-LOGNAME = stefanlester
-# environment
-GIO_LAUNCHED_DESKTOP_FILE = /usr/share/applications/code.desktop
+OS = Windows_NT
 # makefile
 .DEFAULT_GOAL := test
-# environment
-SYSTEMD_EXEC_PID = 2048
-# environment
-HISTCONTROL = ignoredups
-# environment
-EDITOR = /usr/bin/nano
-# environment
-DISPLAY = :0
-# environment
-USER = stefanlester
 # default
 MAKE_VERSION := 4.3
 # environment
-MANAGERPID = 1860
+RLSSVCPORT = 22112
 # environment
-which_declare = declare -f
+PROGRAMFILES(X86) = C:\Program Files (x86)
 # environment
-DEBUGINFOD_URLS = https://debuginfod.fedoraproject.org/ 
+USERDOMAIN_ROAMINGPROFILE = OMEN-BY-HP
 # environment
-GIO_LAUNCHED_DESKTOP_FILE_PID = 7314
+NUMBER_OF_PROCESSORS = 12
 # environment
-_ = /usr/bin/make
+PUBLIC = C:\Users\Public
 # environment
-XDG_RUNTIME_DIR = /run/user/1000
+APPDATA = C:\Users\VADER 1\AppData\Roaming
 # environment
-GOMODCACHE = /home/stefanlester/go/pkg/mod
+HOMEDRIVE = C:
 # environment
-JOURNAL_STREAM = 8:34281
+PROCESSOR_ARCHITECTURE = x86
 # environment
-XDG_SESSION_CLASS = user
+GOMODCACHE = C:\Users\VADER 1\go\pkg\mod
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
-HOME = /home/stefanlester
-# environment
-QT_IM_MODULE = ibus
+COMMONPROGRAMFILES(X86) = C:\Program Files (x86)\Common Files
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-61dd2a8b-1.69.2-main.sock
+TEMP = C:\Users\VADER 1\AppData\Local\Temp
 # environment
-GOPROXY = direct
+VSCODE_IPC_HOOK = \\.\pipe\c697ec85cedcc36f6534447b89237f4d-1.73.0-insider-main-sock
+# environment
+GOPROXY = https://proxy.golang.org,direct
 # default
 .RECIPEPREFIX := 
 # automatic
 <F = $(notdir $<)
 # default
 SUFFIXES := 
+# environment
+ALLUSERSPROFILE = C:\ProgramData
 # default
-.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync check-symlink guile load
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell nocomment grouped-target extra-prereqs archives jobserver output-sync load
 # environment
-XDG_MENU_PREFIX = gnome-
+PROCESSOR_REVISION = a502
 # environment
-GDMSESSION = gnome
+PROCESSOR_IDENTIFIER = Intel64 Family 6 Model 165 Stepping 2, GenuineIntel
 # variable set hash-table stats:
-# Load=97/1024=9%, Rehash=0, Collisions=4/127=3%
+# Load=98/1024=10%, Rehash=0, Collisions=8/125=6%
 
 # Pattern-specific Variable Values
 
@@ -219,13 +217,14 @@ GDMSESSION = gnome
 
 # Directories
 
-# . (device 40, inode 448035): 17 files, no impossibilities.
+# . (key c:/Users/VADER 1/Desktop/SKYWALKER/skywalker, mtime 1666638348): 18 files, no impossibilities.
 
-# 17 files, no impossibilities in 1 directories.
+# 18 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
-# No implicit rules.
+# No imp 
+licit rules.
 
 # Files
 
@@ -253,7 +252,7 @@ build_cli:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-27 19:26:05.760814389
+#  Last modified 2022-10-24 21:05:47
 #  File has been updated.
 #  Successfully updated.
 
@@ -285,13 +284,12 @@ test:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 26 / storage = 229 B / avg = 8 B
-# current buf: size = 8162 B / used = 229 B / count = 26 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 25 / storage = 211 B / avg = 8 B
+# current buf: size = 8174 B / used = 211 B / count = 25 / avg = 8 B
 
-# strcache performance: lookups = 34 / hit rate = 23%
+# strcache performance: lookups = 33 / hit rate = 24%
 # hash-table stats:
- 
-# Load=26/8192=0%, Rehash=0, Collisions=0/34=0%
-# Finished Make data base on Sun Sep 11 16:08:47 2022
+# Load=25/8192=0%, Rehash=0, Collisions=0/33=0%
+# Finished Make data base on Wed Oct 26 16:35:35 2022
 
  
