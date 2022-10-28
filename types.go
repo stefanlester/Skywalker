@@ -12,3 +12,8 @@ type cookieConfig struct {
 	secure   string
 	domain   string
 }
+
+// type databaseConfig struct {
+// 	dsn string
+
+// }
