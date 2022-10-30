@@ -78,10 +78,9 @@ func (c *Skywalker) New(rootPath string) error {
 
 		c.DB = Database{
 			DataType: os.Getenv("DATABASE_TYPE"),
-			Pool: db,
+			Pool:     db,
 		}
 
-		
 	}
 
 	c.InfoLog = infoLog
@@ -102,6 +101,10 @@ func (c *Skywalker) New(rootPath string) error {
 			domain:   os.Getenv("COOKIE_DOMAIN"),
 		},
 		sessionType: os.Getenv("SESSION_TYPE"),
+		database: databaseConfig{
+			database: os.Getenv("DATABASE_TYPE"),
+			dsn:      c.BuildDSN(),
+		},
 	}
 
 	// create session manager
