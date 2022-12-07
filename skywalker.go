@@ -154,6 +154,9 @@ func (c *Skywalker) ListenAndServe() {
 		WriteTimeout: 600 * time.Second,
 	}
 
+	// Close database connection pool
+	defer c.DB.Pool.Close()
+
 	c.InfoLog.Printf("Starting server on port %s", os.Getenv("PORT"))
 	err := serve.ListenAndServe()
 	c.ErrorLog.Fatal(err)
