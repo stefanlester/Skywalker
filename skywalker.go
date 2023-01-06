@@ -50,7 +50,7 @@ func (c *Skywalker) New(rootPath string) error {
 	}
 
 	err := c.Init(pathConfig)
-	if err != nil {
+	if err != nil { 
 		return err
 	}
 
