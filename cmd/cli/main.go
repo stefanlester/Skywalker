@@ -26,6 +26,15 @@ func main() {
 	case "version":
 		color.Yellow("Application version: " + version)
 
+	case "make":
+		if arg2 == "" {
+			exitGracefully(errors.New("make requires a subcommand: (migration|model|handler)"))
+		}
+		err = doMake(arg2, arg3) // do make func resides in make.go
+ 		if err != nil {
+			exitGracefully(err)
+		}
+
 	default:
 		log.Println(arg2, arg3)
 	}
