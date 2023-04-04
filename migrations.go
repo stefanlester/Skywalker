@@ -10,7 +10,7 @@ func (s *Skywalker) MigrateUp(dsn string) error {
 	m, err := migrate.New("file://"+s.RootPath+"/migrations", dsn)
 	if err != nil {
 		return err
-	}
+	} 
 
 	defer m.Close()
 
