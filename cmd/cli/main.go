@@ -19,6 +19,9 @@ func main() {
 		exitGracefully(err)
 	}
 
+	// from helper.go
+	setup()
+
 	switch arg1 {
 	case "help":
 		showHelp()
