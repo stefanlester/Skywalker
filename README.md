@@ -1,2 +1,2 @@
 # Skywalker
- Go Framework For Software Architects
+ Go Lang Framework for Web Developers.
