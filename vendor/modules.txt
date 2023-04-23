@@ -18,6 +18,9 @@ github.com/alicebob/miniredis/v2/geohash
 github.com/alicebob/miniredis/v2/hyperloglog
 github.com/alicebob/miniredis/v2/metro
 github.com/alicebob/miniredis/v2/server
+# github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
+## explicit; go 1.13
+github.com/asaskevich/govalidator
 # github.com/cespare/xxhash v1.1.0
 ## explicit
 github.com/cespare/xxhash
