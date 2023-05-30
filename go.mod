@@ -8,6 +8,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/gomodule/redigo v1.8.9
+	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/joho/godotenv v1.4.0
 )
@@ -67,6 +68,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
 	github.com/dgraph-io/badger/v3 v3.2103.5
 	github.com/fatih/color v1.15.0
+	github.com/gertd/go-pluralize v0.2.1
 	github.com/go-git/go-git/v5 v5.7.0
 	github.com/jackc/pgx/v4 v4.17.2
 )
