@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
+	"path"
+	"path/filepath"
 )
 
 func (s *Skywalker) ReadJSON(w http.ResponseWriter, r *http.Request, data interface{}) error {
@@ -68,4 +71,38 @@ func (s *Skywalker) WriteXML(w http.ResponseWriter, status int, data interface{}
 		return err
 	}
 	return nil
+}
+
+// DownloadFile downloads a file
+func (s *Skywalker) DownloadFile(w http.ResponseWriter, r *http.Request, pathToFile, fileName string) error {
+	fp := path.Join(pathToFile, fileName)
+	fileToServe := filepath.Clean(fp)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; file=\"%s\"", fileName))
+	http.ServeFile(w, r, fileToServe)
+	return nil
+}
+
+// Error404 returns page not found response
+func (s *Skywalker) Error404(w http.ResponseWriter, r *http.Request) {
+	s.ErrorStatus(w, http.StatusNotFound)
+}
+
+// Error500 returns internal server error response
+func (s *Skywalker) Error500(w http.ResponseWriter, r *http.Request) {
+	s.ErrorStatus(w, http.StatusInternalServerError)
+}
+
+// ErrorUnauthorized sends an unauthorized status (client is not known)
+func (s *Skywalker) ErrorUnauthorized(w http.ResponseWriter, r *http.Request) {
+	s.ErrorStatus(w, http.StatusUnauthorized)
+}
+
+// ErrorForbidden returns a forbidden status message (client is known)
+func (s *Skywalker) ErrorForbidden(w http.ResponseWriter, r *http.Request) {
+	s.ErrorStatus(w, http.StatusForbidden)
+}
+
+// ErrorStatus returns a response with the supplied http status
+func (s *Skywalker) ErrorStatus(w http.ResponseWriter, status int) {
+	http.Error(w, http.StatusText(status), status)
 }
