@@ -11,6 +11,7 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/jackc/pgconn v1.13.0
 	github.com/joho/godotenv v1.4.0
+	github.com/justinas/nosurf v1.1.1
 )
 
 require (
