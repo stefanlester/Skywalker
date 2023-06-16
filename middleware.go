@@ -24,7 +24,7 @@ func (s *Skywalker) NoSurf(next http.Handler) http.Handler {
 		Path: "/",
 		Secure: secure,
 		SameSite: http.SameSiteStrictMode,
-		Domain: c.config.cookie.domain,
+		Domain: s.config.cookie.domain,
 	})
 
 	return csrfHandler
