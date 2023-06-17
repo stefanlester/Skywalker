@@ -1,7 +1,11 @@
 package skywalker
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
+	"encoding/base64"
+	"io"
 	"os"
 )
 
@@ -52,4 +56,28 @@ func (c *Skywalker) CreateFileIfNotExist(path string) error {
 	}
 
 	return nil
+}
+
+type Encryption struct {
+	Key []byte
+}
+
+func (e *Encryption) Encrypt(text string) (string, error) {
+	plaintext := []byte(text)
+
+	block, err := aes.NewCipher(e.Key)
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+
+	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
