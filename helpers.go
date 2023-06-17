@@ -81,3 +81,24 @@ func (e *Encryption) Encrypt(text string) (string, error) {
 
 	return base64.URLEncoding.EncodeToString(ciphertext), nil
 }
+
+func (e *Encryption) Decrypt(cryptoText string) (string, error) {
+	ciphertext, _ := base64.URLEncoding.DecodeString(cryptoText)
+
+	block, err := aes.NewCipher(e.Key)
+	if err != nil {
+		return "", err
+	}
+
+	if len(ciphertext) < aes.BlockSize {
+		return "", err
+	}
+
+	iv := ciphertext[:aes.BlockSize]
+	ciphertext = ciphertext[aes.BlockSize:]
+
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(ciphertext, ciphertext)
+
+	return string(ciphertext), nil
+}
