@@ -25,7 +25,7 @@ const version = "1.0.0"
 var myRedisCache *cache.RedisCache
 var myBadgerCache *cache.BadgerCache
 var redisPool *redis.Pool
-var badgerCache *badger.DB
+var badgerConn *badger.DB
 
 // Skywalker is the overall type for the Skywalker package. Members that are exported in this type are
 // are available to any application that uses it
@@ -46,7 +46,7 @@ type Skywalker struct {
 	Cache         cache.Cache
 	Scheduler     *cron.Cron
 	//Mail          mailer.Mail
-	Server        Server
+	Server      Server
 	FileSystems map[string]interface{}
 }
 
@@ -106,6 +106,25 @@ func (c *Skywalker) New(rootPath string) error {
 			Pool:     db,
 		}
 
+	}
+
+	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
+		myRedisCache = c.createClientRedisCache()
+		c.Cache = myRedisCache
+		redisPool = myRedisCache.Conn
+	}
+
+	if os.Getenv("CACHE") == "badger" {
+		myBadgerCache = c.createClientBadgerCache()
+		c.Cache = myBadgerCache
+		badgerConn = myBadgerCache.Conn
+
+		_, err = c.Scheduler.AddFunc("@daily", func() {
+			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	scheduler := cron.New()
@@ -218,6 +237,47 @@ func (c *Skywalker) createRenderer() {
 	}
 
 	c.Render = &myRenderer
+}
+
+func (s *Skywalker) createClientRedisCache() *cache.RedisCache {
+	cacheClient := cache.RedisCache{
+		Conn:   s.createRedisPool(),
+		Prefix: s.config.redis.prefix,
+	}
+	return &cacheClient
+}
+
+func (s *Skywalker) createClientBadgerCache() *cache.BadgerCache {
+	cacheClient := cache.BadgerCache{
+		Conn: s.createBadgerConn(),
+	}
+	return &cacheClient
+}
+
+func (s *Skywalker) createRedisPool() *redis.Pool {
+	return &redis.Pool{
+		MaxIdle:     50,
+		MaxActive:   10000,
+		IdleTimeout: 240 * time.Second,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp",
+				s.config.redis.host,
+				redis.DialPassword(s.config.redis.password))
+		},
+
+		TestOnBorrow: func(conn redis.Conn, t time.Time) error {
+			_, err := conn.Do("PING")
+			return err
+		},
+	}
+}
+
+func (s *Skywalker) createBadgerConn() *badger.DB {
+	db, err := badger.Open(badger.DefaultOptions(s.RootPath + "/tmp/badger"))
+	if err != nil {
+		return nil
+	}
+	return db
 }
 
 func (c *Skywalker) BuildDSN() string {
