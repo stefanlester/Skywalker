@@ -74,4 +74,5 @@ require (
 	github.com/go-git/go-git/v5 v5.7.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/jackc/pgx/v4 v4.17.2
+	github.com/robfig/cron/v3 v3.0.1
 )

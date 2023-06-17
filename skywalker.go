@@ -10,29 +10,44 @@ import (
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/go-chi/chi/v5"
+	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
+	"github.com/robfig/cron/v3"
+	"github.com/stefanlester/skywalker/cache"
 	"github.com/stefanlester/skywalker/render"
 	"github.com/stefanlester/skywalker/session"
 )
 
 const version = "1.0.0"
 
+var myRedisCache *cache.RedisCache
+var myBadgerCache *cache.BadgerCache
+var redisPool *redis.Pool
+var badgerCache *badger.DB
+
 // Skywalker is the overall type for the Skywalker package. Members that are exported in this type are
 // are available to any application that uses it
 type Skywalker struct {
-	AppName  string
-	Debug    bool
-	Version  string
-	ErrorLog *log.Logger
-	InfoLog  *log.Logger
-	RootPath string
-	Routes   *chi.Mux
-	Render   *render.Render // render is a pointer to the render package
-	Session  *scs.SessionManager
-	DB       Database
-	JetViews *jet.Set
-	config   config
+	AppName       string
+	Debug         bool
+	Version       string
+	ErrorLog      *log.Logger
+	InfoLog       *log.Logger
+	RootPath      string
+	Routes        *chi.Mux
+	Render        *render.Render // render is a pointer to the render package
+	Session       *scs.SessionManager
+	DB            Database
+	JetViews      *jet.Set
+	config        config
+	EncryptionKey string
+	Cache         cache.Cache
+	Scheduler     *cron.Cron
+	//Mail          mailer.Mail
+	//Server        Server
+	FileSystems   map[string]interface{}
 }
 
 type config struct {
@@ -50,7 +65,7 @@ func (c *Skywalker) New(rootPath string) error {
 	}
 
 	err := c.Init(pathConfig)
-	if err != nil { 
+	if err != nil {
 		return err
 	}
 
@@ -186,7 +201,7 @@ func (c *Skywalker) createRenderer() {
 		RootPath: c.RootPath,
 		Port:     c.config.port,
 		JetViews: c.JetViews,
-		Session: c.Session,
+		Session:  c.Session,
 	}
 
 	c.Render = &myRenderer
