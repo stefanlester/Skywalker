@@ -13,3 +13,7 @@ coverage:
 ## build_cli: builds the command line tool skywalker and copies it to myapp
 build_cli:
 	@go build -o ../skywalker_myapp/skywalker.exe ./cmd/cli
+
+## build: builds the command line tool dist directory
+build:
+	@go build -o dist/skywalker.exe ./cmd/cli
