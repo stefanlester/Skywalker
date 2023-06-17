@@ -46,8 +46,15 @@ type Skywalker struct {
 	Cache         cache.Cache
 	Scheduler     *cron.Cron
 	//Mail          mailer.Mail
-	//Server        Server
-	FileSystems   map[string]interface{}
+	Server        Server
+	FileSystems map[string]interface{}
+}
+
+type Server struct {
+	ServerName string
+	Port       string
+	Secure     bool
+	URL        string
 }
 
 type config struct {
@@ -56,8 +63,11 @@ type config struct {
 	cookie      cookieConfig
 	sessionType string
 	database    databaseConfig
+	redis       redisConfig
 }
 
+// New reads the .env file, creates our application config, populates the Skywalker type with settings
+// based on .env values, and creates necessary folders and files if they don't exist
 func (c *Skywalker) New(rootPath string) error {
 	pathConfig := initPaths{
 		rootPath:    rootPath,
@@ -97,6 +107,9 @@ func (c *Skywalker) New(rootPath string) error {
 		}
 
 	}
+
+	scheduler := cron.New()
+	c.Scheduler = scheduler
 
 	c.InfoLog = infoLog
 	c.ErrorLog = errorLog
