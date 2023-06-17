@@ -178,11 +178,11 @@ func (c *Skywalker) New(rootPath string) error {
 }
 
 // Init creates necessary folders for our Skywalker application
-func (c *Skywalker) Init(p initPaths) error {
+func (s *Skywalker) Init(p initPaths) error {
 	root := p.rootPath
 	for _, path := range p.folderNames {
 		// create a folder if it doesn't exist
-		err := c.CreateDirIfNotExist(root + "/" + path)
+		err := s.CreateDirIfNotExist(root + "/" + path)
 		if err != nil {
 			return err
 		}
@@ -191,22 +191,31 @@ func (c *Skywalker) Init(p initPaths) error {
 }
 
 // ListenAndServe starts the web server
-func (c *Skywalker) ListenAndServe() {
+func (s *Skywalker) ListenAndServe() {
 	serve := &http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
-		ErrorLog:     c.ErrorLog,
-		Handler:      c.Routes,
+		ErrorLog:     s.ErrorLog,
+		Handler:      s.Routes,
 		IdleTimeout:  30 * time.Second,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 600 * time.Second,
 	}
 
-	// Close database connection pool
-	defer c.DB.Pool.Close()
+	if s.DB.Pool != nil {
+		defer s.DB.Pool.Close()
+	}
 
-	c.InfoLog.Printf("Starting server on port %s", os.Getenv("PORT"))
+	if redisPool != nil {
+		defer redisPool.Close()
+	}
+
+	if badgerConn != nil {
+		defer badgerConn.Close()
+	}
+
+	s.InfoLog.Printf("Listening on port %s", os.Getenv("PORT"))
 	err := serve.ListenAndServe()
-	c.ErrorLog.Fatal(err)
+	s.ErrorLog.Fatal(err)
 }
 
 func (c *Skywalker) checkDotEnv(path string) error {
