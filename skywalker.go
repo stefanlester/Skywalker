@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/CloudyKit/jet/v6"
@@ -16,6 +17,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron/v3"
 	"github.com/stefanlester/skywalker/cache"
+	"github.com/stefanlester/skywalker/filesystems/miniofilesystem"
+	"github.com/stefanlester/skywalker/mailer"
 	"github.com/stefanlester/skywalker/render"
 	"github.com/stefanlester/skywalker/session"
 )
@@ -45,9 +48,9 @@ type Skywalker struct {
 	EncryptionKey string
 	Cache         cache.Cache
 	Scheduler     *cron.Cron
-	//Mail          mailer.Mail
-	Server      Server
-	FileSystems map[string]interface{}
+	Mail          mailer.Mail
+	Server        Server
+	FileSystems   map[string]interface{}
 }
 
 type Server struct {
@@ -68,18 +71,18 @@ type config struct {
 
 // New reads the .env file, creates our application config, populates the Skywalker type with settings
 // based on .env values, and creates necessary folders and files if they don't exist
-func (c *Skywalker) New(rootPath string) error {
+func (s *Skywalker) New(rootPath string) error {
 	pathConfig := initPaths{
 		rootPath:    rootPath,
 		folderNames: []string{"handlers", "migrations", "views", "data", "public", "tmp", "logs", "middleware"},
 	}
 
-	err := c.Init(pathConfig)
+	err := s.Init(pathConfig)
 	if err != nil {
 		return err
 	}
 
-	err = c.checkDotEnv(rootPath)
+	err = s.checkDotEnv(rootPath)
 	if err != nil {
 		return err
 	}
@@ -91,35 +94,38 @@ func (c *Skywalker) New(rootPath string) error {
 	}
 
 	// create loggers
-	infoLog, errorLog := c.startLoggers()
+	infoLog, errorLog := s.startLoggers()
 
 	//connect to database
 	if os.Getenv("DATABASE_TYPE") != "" {
-		db, err := c.OpenDB(os.Getenv("DATABASE_TYPE"), c.BuildDSN())
+		db, err := s.OpenDB(os.Getenv("DATABASE_TYPE"), s.BuildDSN())
 		if err != nil {
 			errorLog.Println(err)
 			os.Exit(1)
 		}
 
-		c.DB = Database{
+		s.DB = Database{
 			DataType: os.Getenv("DATABASE_TYPE"),
 			Pool:     db,
 		}
 
 	}
 
+	scheduler := cron.New()
+	s.Scheduler = scheduler
+
 	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
-		myRedisCache = c.createClientRedisCache()
-		c.Cache = myRedisCache
+		myRedisCache = s.createClientRedisCache()
+		s.Cache = myRedisCache
 		redisPool = myRedisCache.Conn
 	}
 
 	if os.Getenv("CACHE") == "badger" {
-		myBadgerCache = c.createClientBadgerCache()
-		c.Cache = myBadgerCache
+		myBadgerCache = s.createClientBadgerCache()
+		s.Cache = myBadgerCache
 		badgerConn = myBadgerCache.Conn
 
-		_, err = c.Scheduler.AddFunc("@daily", func() {
+		_, err = s.Scheduler.AddFunc("@daily", func() {
 			_ = myBadgerCache.Conn.RunValueLogGC(0.7)
 		})
 		if err != nil {
@@ -127,17 +133,15 @@ func (c *Skywalker) New(rootPath string) error {
 		}
 	}
 
-	scheduler := cron.New()
-	c.Scheduler = scheduler
+	s.InfoLog = infoLog
+	s.ErrorLog = errorLog
+	s.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
+	s.Version = version
+	s.RootPath = rootPath
+	s.Mail = s.createMailer()
+	s.Routes = s.routes().(*chi.Mux)
 
-	c.InfoLog = infoLog
-	c.ErrorLog = errorLog
-	c.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
-	c.Version = version
-	c.RootPath = rootPath
-	c.Routes = c.routes().(*chi.Mux)
-
-	c.config = config{
+	s.config = config{
 		port:     os.Getenv("PORT"),
 		renderer: os.Getenv("RENDERER"),
 		cookie: cookieConfig{
@@ -150,29 +154,50 @@ func (c *Skywalker) New(rootPath string) error {
 		sessionType: os.Getenv("SESSION_TYPE"),
 		database: databaseConfig{
 			database: os.Getenv("DATABASE_TYPE"),
-			dsn:      c.BuildDSN(),
+			dsn:      s.BuildDSN(),
+		},
+		redis: redisConfig{
+			host:     os.Getenv("REDIS_HOST"),
+			password: os.Getenv("REDIS_PASSWORD"),
+			prefix:   os.Getenv("REDIS_PREFIX"),
 		},
 	}
 
 	// create session manager
 	session := session.Session{
-		CookieLifetime: c.config.cookie.lifetime,
-		CookiePersist:  c.config.cookie.persist,
-		CookieName:     c.config.cookie.name,
-		SessionType:    c.config.sessionType,
-		CookieDomain:   c.config.cookie.domain,
+		CookieLifetime: s.config.cookie.lifetime,
+		CookiePersist:  s.config.cookie.persist,
+		CookieName:     s.config.cookie.name,
+		SessionType:    s.config.sessionType,
+		CookieDomain:   s.config.cookie.domain,
 	}
 
-	c.Session = session.InitSession()
+	switch s.config.sessionType {
+	case "redis":
+		session.RedisPool = myRedisCache.Conn
+	case "mysql", "postgres", "mariadb", "postgresql":
+		session.DBPool = s.DB.Pool
+	}
 
-	var views = jet.NewSet(
-		jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
-		jet.InDevelopmentMode(),
-	)
+	s.Session = session.InitSession()
+	s.EncryptionKey = os.Getenv("KEY")
 
-	c.JetViews = views
+	if s.Debug {
+		var views = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+			jet.InDevelopmentMode(),
+		)
+		s.JetViews = views
+	} else {
+		var views = jet.NewSet(
+			jet.NewOSFileSystemLoader(fmt.Sprintf("%s/views", rootPath)),
+		)
+		s.JetViews = views
+	}
 
-	c.createRenderer()
+	s.createRenderer()
+	s.FileSystems = s.createFileSystems()
+	go s.Mail.ListenForMail()
 
 	return nil
 }
@@ -218,8 +243,8 @@ func (s *Skywalker) ListenAndServe() {
 	s.ErrorLog.Fatal(err)
 }
 
-func (c *Skywalker) checkDotEnv(path string) error {
-	err := c.CreateFileIfNotExist(fmt.Sprintf("%s/.env", path))
+func (s *Skywalker) checkDotEnv(path string) error {
+	err := s.CreateFileIfNotExist(fmt.Sprintf("%s/.env", path))
 	if err != nil {
 		return err
 	}
@@ -236,16 +261,37 @@ func (c *Skywalker) startLoggers() (*log.Logger, *log.Logger) {
 	return infoLog, errorLog
 }
 
-func (c *Skywalker) createRenderer() {
+func (s *Skywalker) createRenderer() {
 	myRenderer := render.Render{
-		Renderer: c.config.renderer,
-		RootPath: c.RootPath,
-		Port:     c.config.port,
-		JetViews: c.JetViews,
-		Session:  c.Session,
+		Renderer: s.config.renderer,
+		RootPath: s.RootPath,
+		Port:     s.config.port,
+		JetViews: s.JetViews,
+		Session:  s.Session,
 	}
 
-	c.Render = &myRenderer
+	s.Render = &myRenderer
+}
+
+func (s *Skywalker) createMailer() mailer.Mail {
+	port, _ := strconv.Atoi(os.Getenv("SMTP_PORT"))
+	m := mailer.Mail{
+		Domain:      os.Getenv("MAIL_DOMAIN"),
+		Templates:   s.RootPath + "/mail",
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        port,
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		Encryption:  os.Getenv("SMTP_ENCRYPTION"),
+		FromName:    os.Getenv("FROM_NAME"),
+		FromAddress: os.Getenv("FROM_ADDRESS"),
+		Jobs:        make(chan mailer.Message, 20),
+		Results:     make(chan mailer.Result, 20),
+		API:         os.Getenv("MAILER_API"),
+		APIKey:      os.Getenv("MAILER_KEY"),
+		APIUrl:      os.Getenv("MAILER_URL"),
+	}
+	return m
 }
 
 func (s *Skywalker) createClientRedisCache() *cache.RedisCache {
@@ -301,13 +347,46 @@ func (c *Skywalker) BuildDSN() string {
 			os.Getenv("DATABASE_NAME"),
 			os.Getenv("DATABASE_SSL_MODE"))
 
+		// we check to see if a database password has been supplied, since including "password=" with nothing
+		// after it sometimes causes postgres to fail to allow a connection.
 		if os.Getenv("DATABASE_PASS") != "" {
 			dsn = fmt.Sprintf("%s password=%s", dsn, os.Getenv("DATABASE_PASS"))
 		}
+
+	case "mysql", "mariadb":
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?collation=utf8_unicode_ci&timeout=5s&parseTime=true&tls=%s&readTimeout=5s",
+			os.Getenv("DATABASE_USER"),
+			os.Getenv("DATABASE_PASS"),
+			os.Getenv("DATABASE_HOST"),
+			os.Getenv("DATABASE_PORT"),
+			os.Getenv("DATABASE_NAME"),
+			os.Getenv("DATABASE_SSL_MODE"))
 
 	default:
 
 	}
 
 	return dsn
+}
+
+func (s *Skywalker) createFileSystems() map[string]interface{} {
+	fileSystems := make(map[string]interface{})
+
+	if os.Getenv("MINIO_SECRET") != "" {
+		useSSL := false
+		if strings.ToLower(os.Getenv("MINIO_USESSL")) == "true" {
+			useSSL = true
+		}
+
+		minio := miniofilesystem.Minio{
+			Endpoint: os.Getenv("MINIO_ENDPOINT"),
+			Key:      os.Getenv("MINIO_KEY"),
+			Secret:   os.Getenv("MINIO_SECRET"),
+			UseSSL:   useSSL,
+			Region:   os.Getenv("MINIO_REGION"),
+			Bucket:   os.Getenv("MINIO_BUCKET"),
+		}
+		fileSystems["MINIO"] = minio
+	}
+	return fileSystems
 }
