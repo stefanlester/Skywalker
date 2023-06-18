@@ -30,8 +30,7 @@ func doNew(appName string) {
 	// git clone the skeleton application
 	color.Green("\tCloning repository...")
 	_, err := git.PlainClone("./"+appName, false, &git.CloneOptions{
-		// URL: "git@github.com:tsawler/celeritas-app.git",
-		URL: "https://github.com/tsawler/celeritas-app.git",
+		URL: "https://github.com/stefanlester/skywalker_engine.git",
 		Progress: os.Stdout,
 		Depth: 1,
 	})
@@ -63,7 +62,7 @@ func doNew(appName string) {
 
 	// create a makefile
 	if runtime.GOOS == "windows" {
-		source, err := os.Open(fmt.Sprintf("./%s/Makefile.windows", appName))
+		source, err := os.Open(fmt.Sprintf("./%s/Makefile", appName))
 		if err != nil {
 			exitGracefully(err)
 		}

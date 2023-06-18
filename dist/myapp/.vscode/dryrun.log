@@ -1,0 +1,8 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'c:/Users/VADER 1/Desktop/SKYWALKER/skywalker_myapp'
+go mod vendor
+echo "Building Skywalker..."
+go build -o tmp/SkywalkerApp .
+echo "Skywalker built!"
+make: Leaving directory 'c:/Users/VADER 1/Desktop/SKYWALKER/skywalker_myapp'
+ 
