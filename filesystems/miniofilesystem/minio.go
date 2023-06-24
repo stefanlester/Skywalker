@@ -50,6 +50,7 @@ func (m *Minio) Put(fileName, folder string) error {
 	return nil
 }
 
+// List all file systems
 func (m *Minio) List(prefix string) ([]filesystems.Listing, error) {
 	var listing []filesystems.Listing
 
@@ -109,6 +110,7 @@ func (m *Minio) Delete(itemsToDelete []string) bool {
 
 }
 
+// Get pulls a file from the remote file system and saves it somewhere on our server
 func (m *Minio) Get(destination string, items ...string) error {
 	ctx, cancel := context.WithCancel((context.Background()))
 	defer cancel()

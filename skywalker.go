@@ -400,5 +400,6 @@ func (s *Skywalker) createFileSystems() map[string]interface{} {
 		}
 		fileSystems["MINIO"] = minio
 	}
+	
 	return fileSystems
 }

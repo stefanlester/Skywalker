@@ -2,7 +2,7 @@ package filesystems
 
 import "time"
 
-// FS is the interface for file systems. IN order to satisfy the interface,
+// FS is the interface for file systems. In order to satisfy the interface,
 // all of its functions must exist
 type FS interface {
 	Put(fileName, folder string) error
