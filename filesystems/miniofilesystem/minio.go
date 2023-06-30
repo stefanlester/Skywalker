@@ -12,8 +12,7 @@ import (
 	"github.com/stefanlester/skywalker/filesystems"
 )
 
-// Minio is the overall type for the minio filesystem, and contains
-// the connection credentials, endpoint, and the bucket to use
+// Minio is the overall type for the minio filesystem, and contains the connection credentials, endpoint, and the bucket to use
 type Minio struct {
 	Endpoint string
 	Key      string
@@ -23,8 +22,7 @@ type Minio struct {
 	Bucket   string
 }
 
-// getCredentials generates a minio client using the credentials stored in
-// the Minio type
+// getCredentials generates a minio client using the credentials stored in the Minio type
 func (m *Minio) getCredentials() *minio.Client {
 	client, err := minio.New(m.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(m.Key, m.Secret, ""),
