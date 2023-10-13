@@ -2,7 +2,6 @@ package miniofilesystem
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"path"
 	"strings"
@@ -12,77 +11,61 @@ import (
 	"github.com/stefanlester/skywalker/filesystems"
 )
 
-// Minio is the overall type for the minio filesystem, and contains the connection credentials, endpoint, and the bucket to use
+// Minio is the overall type for the Minio filesystem, containing connection credentials and configuration.
 type Minio struct {
-	Endpoint string
-	Key      string
-	Secret   string
-	UseSSL   bool
-	Region   string
-	Bucket   string
+	Client *minio.Client
+	Bucket string
 }
 
-// getCredentials generates a minio client using the credentials stored in the Minio type
-func (m *Minio) getCredentials() *minio.Client {
-	client, err := minio.New(m.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(m.Key, m.Secret, ""),
-		Secure: m.UseSSL,
+// NewMinio creates a new Minio instance and initializes the Minio client.
+func NewMinio(endpoint, key, secret, region, bucket string, useSSL bool) (*Minio, error) {
+	client, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(key, secret, ""),
+		Secure: useSSL,
+		Region: region,
 	})
 	if err != nil {
-		log.Println(err)
+		return nil, err
 	}
 
-	return client
+	return &Minio{Client: client, Bucket: bucket}, nil
 }
 
-// Put transfers a file to the remote file system
+// Put transfers a file to the remote filesystem.
 func (m *Minio) Put(fileName, folder string) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
+	ctx := context.Background()
 	objectName := path.Base(fileName)
-	client := m.getCredentials()
-	uploadInfo, err := client.FPutObject(ctx, m.Bucket, fmt.Sprintf("%s/%s", folder, objectName), fileName, minio.PutObjectOptions{})
+	_, err := m.Client.FPutObject(ctx, m.Bucket, path.Join(folder, objectName), fileName, minio.PutObjectOptions{})
 	if err != nil {
-		log.Println("Failed with FPutObject")
-		log.Println(err)
-		log.Println("UploadInfo:", uploadInfo)
+		log.Printf("Failed to upload %s: %v", objectName, err)
 		return err
 	}
-
 	return nil
 }
 
-// List returns a listing of all files in the remote bucket with the
-// given prefix, except for files with a leading . in the name
+// List returns a listing of files in the remote bucket with the given prefix.
 func (m *Minio) List(prefix string) ([]filesystems.Listing, error) {
 	var listing []filesystems.Listing
+	ctx := context.Background()
 
-	ctx, cancel := context.WithCancel((context.Background()))
-	defer cancel()
-
-	client := m.getCredentials()
-
-	objectCh := client.ListObjects(ctx, m.Bucket, minio.ListObjectsOptions{
+	objectCh := m.Client.ListObjects(ctx, m.Bucket, minio.ListObjectsOptions{
 		Prefix:    prefix,
 		Recursive: true,
 	})
 
 	for object := range objectCh {
 		if object.Err != nil {
-			fmt.Println(object.Err)
+			log.Printf("Failed to list objects: %v", object.Err)
 			return listing, object.Err
 		}
 
 		if !strings.HasPrefix(object.Key, ".") {
-			b := float64(object.Size)
-			kb := b / 1024
-			mb := kb / 1024
+			sizeMB := float64(object.Size) / (1024 * 1024)
 			item := filesystems.Listing{
 				Etag:         object.ETag,
 				LastModified: object.LastModified,
 				Key:          object.Key,
-				Size:         mb,
+				Size:         sizeMB,
 			}
 			listing = append(listing, item)
 		}
@@ -91,40 +74,31 @@ func (m *Minio) List(prefix string) ([]filesystems.Listing, error) {
 	return listing, nil
 }
 
-// Delete removes one or more files from the remote filesystem
-func (m *Minio) Delete(itemsToDelete []string) bool {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	client := m.getCredentials()
-
-	opts := minio.RemoveObjectOptions{
-		GovernanceBypass: true,
-	}
+// Delete removes one or more files from the remote filesystem.
+func (m *Minio) Delete(itemsToDelete []string) error {
+	ctx := context.Background()
+	opts := minio.RemoveObjectOptions{GovernanceBypass: true}
 
 	for _, item := range itemsToDelete {
-		err := client.RemoveObject(ctx, m.Bucket, item, opts)
+		err := m.Client.RemoveObject(ctx, m.Bucket, item, opts)
 		if err != nil {
-			fmt.Println(err)
-			return false
+			log.Printf("Failed to delete %s: %v", item, err)
+			return err
 		}
 	}
 
-	return true
-
+	return nil
 }
 
-// Get pulls a file from the remote file system and saves it somewhere on our server
+// Get pulls a file from the remote filesystem and saves it locally.
 func (m *Minio) Get(destination string, items ...string) error {
-	ctx, cancel := context.WithCancel((context.Background()))
-	defer cancel()
-
-	client := m.getCredentials()
+	ctx := context.Background()
 
 	for _, item := range items {
-		err := client.FGetObject(ctx, m.Bucket, item, fmt.Sprintf("%s/%s", destination, path.Base(item)), minio.GetObjectOptions{})
+		objectName := path.Base(item)
+		err := m.Client.FGetObject(ctx, m.Bucket, item, path.Join(destination, objectName), minio.GetObjectOptions{})
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("Failed to download %s: %v", objectName, err)
 			return err
 		}
 	}
