@@ -92,24 +92,28 @@ func (m *Minio) List(ctx context.Context, prefix string) ([]filesystems.Listing,
 }
 
 // Delete removes one or more files from the remote filesystem.
-func (m *Minio) Delete(ctx context.Context, itemsToDelete []string) error {
-	client, err := m.getCredentials()
+func (m *Minio) Delete(itemsToDelete []string) bool {
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
+
+    client, err := m.getCredentials()
+
 	if err != nil {
-		return err
+		fmt.Println("Error getting credentials")
 	}
 
-	opts := minio.RemoveObjectOptions{
-		GovernanceBypass: true,
-	}
+    opts := minio.RemoveObjectOptions{
+        GovernanceBypass: true,
+    }
 
-	for _, item := range itemsToDelete {
-		err := client.RemoveObject(ctx, m.Bucket, item, opts)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+    for _, item := range itemsToDelete {
+        err := client.RemoveObject(ctx, m.Bucket, item, opts)
+        if err != nil {
+            fmt.Println(err)
+            return false
+        }
+    }
+    return true
 }
 
 // Get pulls a file from the remote file system and saves it somewhere on our server.
