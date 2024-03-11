@@ -132,3 +132,5 @@ func (m *Minio) Get(ctx context.Context, destination string, items ...string) er
 
 	return nil
 }
+
+
