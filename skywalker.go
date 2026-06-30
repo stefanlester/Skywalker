@@ -18,6 +18,9 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/stefanlester/skywalker/cache"
 	"github.com/stefanlester/skywalker/filesystems/miniofilesystem"
+	"github.com/stefanlester/skywalker/filesystems/s3filesystem"
+	"github.com/stefanlester/skywalker/filesystems/sftpfilesystem"
+	"github.com/stefanlester/skywalker/filesystems/webdavfilesystem"
 	"github.com/stefanlester/skywalker/mailer"
 	"github.com/stefanlester/skywalker/render"
 	"github.com/stefanlester/skywalker/session"
@@ -381,6 +384,11 @@ func (c *Skywalker) BuildDSN() string {
 	return dsn
 }
 
+// createFileSystems builds the remote file system backends that are configured
+// via environment variables and returns them keyed by name. Each backend is only
+// constructed when its gating env var is present. The stored value is a pointer,
+// because every backend's FS methods use pointer receivers, so a value would not
+// satisfy the filesystems.FS interface.
 func (s *Skywalker) createFileSystems() map[string]interface{} {
 	fileSystems := make(map[string]interface{})
 
@@ -398,8 +406,38 @@ func (s *Skywalker) createFileSystems() map[string]interface{} {
 			Region:   os.Getenv("MINIO_REGION"),
 			Bucket:   os.Getenv("MINIO_BUCKET"),
 		}
-		fileSystems["MINIO"] = minio
+		fileSystems["MINIO"] = &minio
 	}
-	
+
+	if os.Getenv("S3_SECRET") != "" {
+		s3 := s3filesystem.S3{
+			Key:      os.Getenv("S3_KEY"),
+			Secret:   os.Getenv("S3_SECRET"),
+			Region:   os.Getenv("S3_REGION"),
+			Endpoint: os.Getenv("S3_ENDPOINT"),
+			Bucket:   os.Getenv("S3_BUCKET"),
+		}
+		fileSystems["S3"] = &s3
+	}
+
+	if os.Getenv("SFTP_HOST") != "" {
+		sftp := sftpfilesystem.SFTP{
+			Host: os.Getenv("SFTP_HOST"),
+			User: os.Getenv("SFTP_USER"),
+			Pass: os.Getenv("SFTP_PASS"),
+			Port: os.Getenv("SFTP_PORT"),
+		}
+		fileSystems["SFTP"] = &sftp
+	}
+
+	if os.Getenv("WEBDAV_HOST") != "" {
+		webdav := webdavfilesystem.WebDAV{
+			Host: os.Getenv("WEBDAV_HOST"),
+			User: os.Getenv("WEBDAV_USER"),
+			Pass: os.Getenv("WEBDAV_PASS"),
+		}
+		fileSystems["WEBDAV"] = &webdav
+	}
+
 	return fileSystems
 }
