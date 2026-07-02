@@ -6,6 +6,7 @@ import (
 	"log"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -21,20 +22,28 @@ type S3 struct {
 	Region   string
 	Endpoint string
 	Bucket   string
+
+	clientOnce sync.Once
+	client     *minio.Client
 }
 
-// getCredentials generates a minio client using the credentials stored in
-// the S3 type. S3 always uses HTTPS, so Secure is hard-coded to true.
+// getCredentials returns a minio client built from the credentials stored in
+// the S3 type. S3 always uses HTTPS, so Secure is hard-coded to true. The
+// client is created once per S3 instance and reused; minio-go clients are
+// safe for concurrent use.
 func (s *S3) getCredentials() *minio.Client {
-	client, err := minio.New(s.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(s.Key, s.Secret, ""),
-		Region: s.Region,
-		Secure: true,
+	s.clientOnce.Do(func() {
+		client, err := minio.New(s.Endpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(s.Key, s.Secret, ""),
+			Region: s.Region,
+			Secure: true,
+		})
+		if err != nil {
+			log.Println(err)
+		}
+		s.client = client
 	})
-	if err != nil {
-		log.Println(err)
-	}
-	return client
+	return s.client
 }
 
 // Put transfers a file to the remote file system

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/stefanlester/skywalker/filesystems"
 	"github.com/studio-b12/gowebdav"
@@ -18,16 +19,30 @@ type WebDAV struct {
 	Host string
 	User string
 	Pass string
+
+	clientMu sync.Mutex
+	client   *gowebdav.Client
 }
 
-// getConnection builds a gowebdav client from the stored credentials and
-// verifies connectivity via Connect, returning the ready-to-use client.
+// getConnection returns a gowebdav client for the stored credentials. The
+// client is built and its connectivity verified via Connect once, then cached
+// for reuse (gowebdav clients are safe for concurrent use). Connect performs
+// network I/O, so a failure is not cached: the next call retries.
 func (s *WebDAV) getConnection() (*gowebdav.Client, error) {
+	s.clientMu.Lock()
+	defer s.clientMu.Unlock()
+
+	if s.client != nil {
+		return s.client, nil
+	}
+
 	client := gowebdav.NewClient(s.Host, s.User, s.Pass)
 	if err := client.Connect(); err != nil {
 		return nil, err
 	}
-	return client, nil
+
+	s.client = client
+	return s.client, nil
 }
 
 // Put transfers a file to the remote file system, storing it under folder using

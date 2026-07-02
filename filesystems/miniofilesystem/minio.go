@@ -6,6 +6,7 @@ import (
 	"log"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -21,19 +22,26 @@ type Minio struct {
 	UseSSL   bool
 	Region   string
 	Bucket   string
+
+	clientOnce sync.Once
+	client     *minio.Client
 }
 
-// getCredentials generates a minio client using the credentials stored in
-// the Minio type
+// getCredentials returns a minio client built from the credentials stored in
+// the Minio type. The client is created once per Minio instance and reused;
+// minio-go clients are safe for concurrent use.
 func (m *Minio) getCredentials() *minio.Client {
-	client, err := minio.New(m.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(m.Key, m.Secret, ""),
-		Secure: m.UseSSL,
+	m.clientOnce.Do(func() {
+		client, err := minio.New(m.Endpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(m.Key, m.Secret, ""),
+			Secure: m.UseSSL,
+		})
+		if err != nil {
+			log.Println(err)
+		}
+		m.client = client
 	})
-	if err != nil {
-		log.Println(err)
-	}
-	return client
+	return m.client
 }
 
 // Put transfers a file to the remote file system
