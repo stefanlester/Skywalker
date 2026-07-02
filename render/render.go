@@ -42,11 +42,13 @@ func (s *Render) defaultData(td *TemplateData, r *http.Request) *TemplateData {
 	td.ServerName = s.ServerName
 	td.CSRFToken = nosurf.Token(r)
 	td.Port = s.Port
-	if s.Session.Exists(r.Context(), "userID") {
-		td.IsAuthenticated = true
+	if s.Session != nil {
+		if s.Session.Exists(r.Context(), "userID") {
+			td.IsAuthenticated = true
+		}
+		td.Error = s.Session.PopString(r.Context(), "error")
+		td.Flash = s.Session.PopString(r.Context(), "flash")
 	}
-	td.Error = s.Session.PopString(r.Context(), "error")
-	td.Flash = s.Session.PopString(r.Context(), "flash")
 	return td
 }
 

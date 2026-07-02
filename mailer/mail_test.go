@@ -7,6 +7,9 @@ import (
 
 
 func TestMail_SendSMTPMessage(t *testing.T) {
+	if !dockerAvailable {
+		t.Skip("Docker not available — skipping SMTP test")
+	}
 	msg := Message{
 		From: "me@here.com",
 		FromName: "Joe",
@@ -23,6 +26,9 @@ func TestMail_SendSMTPMessage(t *testing.T) {
 }
 
 func TestMail_SendUsingChan(t *testing.T) {
+	if !dockerAvailable {
+		t.Skip("Docker not available — skipping SMTP test")
+	}
 	msg := Message{
 		From: "me@here.com",
 		FromName: "Joe",
@@ -100,6 +106,9 @@ func TestMail_buildPlainMessage(t *testing.T) {
 }
 
 func TestMail_send(t *testing.T) {
+	if !dockerAvailable {
+		t.Skip("Docker not available — skipping SMTP test")
+	}
 	msg := Message{
 		From: "me@here.com",
 		FromName: "Joe",

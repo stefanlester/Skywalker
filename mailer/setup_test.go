@@ -13,6 +13,7 @@ import (
 
 var pool *dockertest.Pool
 var resource *dockertest.Resource
+var dockerAvailable bool
 
 var mailer = Mail{
 	Domain: "localhost",
@@ -29,9 +30,20 @@ var mailer = Mail{
 func TestMain(m *testing.M) {
 	p, err := dockertest.NewPool("")
 	if err != nil {
-		log.Fatal("could not connect to docker", err)
+		log.Println("could not connect to docker — skipping mailer container tests:", err)
+		go mailer.ListenForMail()
+		os.Exit(m.Run())
 	}
 	pool = p
+
+	// If the Docker daemon is not reachable, run the tests that do not need a
+	// container and skip the ones that do (they guard on dockerAvailable).
+	if err := pool.Client.Ping(); err != nil {
+		log.Println("Docker not available — skipping mailer container tests")
+		go mailer.ListenForMail()
+		os.Exit(m.Run())
+	}
+	dockerAvailable = true
 
 	opts := dockertest.RunOptions{
 		Repository: "mailhog/mailhog",
@@ -48,10 +60,12 @@ func TestMain(m *testing.M) {
 		},
 	}
 
-	resource, err := pool.RunWithOptions(&opts)
+	resource, err = pool.RunWithOptions(&opts)
 	if err != nil {
 		log.Println(err)
-		_ = pool.Purge(resource)
+		if resource != nil {
+			_ = pool.Purge(resource)
+		}
 		log.Fatal("Could not start resource")
 	}
 

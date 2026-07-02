@@ -1,3 +1,6 @@
 # Build in module mode — do not commit the root module's vendor tree.
 # Anchored to repo root so the generated dist/myapp/vendor/ is unaffected.
 /vendor/
+
+# Runtime badger scratch created by the cache tests.
+cache/testdata/tmp/

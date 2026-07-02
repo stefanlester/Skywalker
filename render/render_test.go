@@ -6,6 +6,13 @@ import (
 	"testing"
 )
 
+// withSession loads a session into the request context so the renderer's
+// defaultData can read/write session values without a nil-pointer panic.
+func withSession(r *http.Request) *http.Request {
+	ctx, _ := testSession.Load(r.Context(), "")
+	return r.WithContext(ctx)
+}
+
 var pageData = []struct {
 	name          string
 	renderer      string
@@ -27,6 +34,8 @@ func TestRender_Page(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		r = withSession(r)
 
 		w := httptest.NewRecorder()
 
@@ -53,6 +62,8 @@ func TestRender_GoPage(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	r = withSession(r)
+
 	testRenderer.Renderer = "go"
 	testRenderer.RootPath = "./testdata"
 
@@ -68,6 +79,8 @@ func TestRender_JetPage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	r = withSession(r)
 
 	testRenderer.Renderer = "jet"
 
