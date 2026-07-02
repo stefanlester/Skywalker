@@ -65,6 +65,9 @@ go run .                 # starts on the PORT set in .env (skeleton default: 400
 Open <http://localhost:4000>. On first boot `New()` creates the standard folders: `handlers`,
 `migrations`, `views`, `data`, `public`, `tmp`, `logs`, `middleware`.
 
+**For the full guide — handlers, rendering, sessions, DB, cache, mail, filesystems, APIs — see
+[docs/USAGE.md](docs/USAGE.md).**
+
 ## Configuration
 
 Everything is driven by environment variables (loaded from `.env`). The common ones:
