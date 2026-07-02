@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
@@ -19,8 +20,14 @@ type Render struct {
 	Secure     bool
 	Port       string
 	ServerName string
-	JetViews   *jet.Set
-	Session    *scs.SessionManager
+	// Debug disables the Go template cache so templates are re-parsed from
+	// disk on every request, matching Jet's InDevelopmentMode behavior.
+	Debug    bool
+	JetViews *jet.Set
+	Session  *scs.SessionManager
+
+	templateCache   map[string]*template.Template
+	templateCacheMu sync.RWMutex
 }
 
 type TemplateData struct {
@@ -64,9 +71,39 @@ func (s *Render) Page(w http.ResponseWriter, r *http.Request, view string, varia
 	return errors.New("no rendering engine specified")
 }
 
+// goTemplate returns the parsed Go template for view. Templates are parsed
+// once and cached; when Debug is true the cache is bypassed and the template
+// is re-parsed from disk on every call.
+func (s *Render) goTemplate(view string) (*template.Template, error) {
+	if s.Debug {
+		return template.ParseFiles(fmt.Sprintf("%s/views/%s.page.tmpl", s.RootPath, view))
+	}
+
+	s.templateCacheMu.RLock()
+	tmpl, ok := s.templateCache[view]
+	s.templateCacheMu.RUnlock()
+	if ok {
+		return tmpl, nil
+	}
+
+	tmpl, err := template.ParseFiles(fmt.Sprintf("%s/views/%s.page.tmpl", s.RootPath, view))
+	if err != nil {
+		return nil, err
+	}
+
+	s.templateCacheMu.Lock()
+	if s.templateCache == nil {
+		s.templateCache = make(map[string]*template.Template)
+	}
+	s.templateCache[view] = tmpl
+	s.templateCacheMu.Unlock()
+
+	return tmpl, nil
+}
+
 // GoPage renders a standard Go template
 func (s *Render) GoPage(w http.ResponseWriter, r *http.Request, view string, data interface{}) error {
-	tmpl, err := template.ParseFiles(fmt.Sprintf("%s/views/%s.page.tmpl", s.RootPath, view))
+	tmpl, err := s.goTemplate(view)
 	if err != nil {
 		return err
 	}

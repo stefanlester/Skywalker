@@ -281,6 +281,7 @@ func (s *Skywalker) createRenderer() {
 		Renderer: s.config.renderer,
 		RootPath: s.RootPath,
 		Port:     s.config.port,
+		Debug:    s.Debug,
 		JetViews: s.JetViews,
 		Session:  s.Session,
 	}
