@@ -18,6 +18,7 @@ require (
 	github.com/minio/minio-go/v7 v7.0.57
 	github.com/ory/dockertest/v3 v3.10.0
 	github.com/pkg/sftp v1.13.10
+	github.com/studio-b12/gowebdav v0.12.0
 	github.com/vanng822/go-premailer v1.20.2
 	github.com/xhit/go-simple-mail/v2 v2.13.0
 	golang.org/x/crypto v0.41.0
