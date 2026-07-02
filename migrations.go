@@ -2,6 +2,7 @@ package skywalker
 
 import (
 	"log"
+	"path/filepath"
 
 	"github.com/golang-migrate/migrate/v4"
 
@@ -11,8 +12,14 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
+// migrationSourceURL builds the file:// source URL for golang-migrate.
+// RootPath is converted to forward slashes so the URL parses on Windows.
+func (s *Skywalker) migrationSourceURL() string {
+	return "file://" + filepath.ToSlash(s.RootPath) + "/migrations"
+}
+
 func (s *Skywalker) MigrateUp(dsn string) error {
-	m, err := migrate.New("file://" + s.RootPath + "/migrations", dsn)
+	m, err := migrate.New(s.migrationSourceURL(), dsn)
 	if err != nil {
 		return err
 	}
@@ -26,7 +33,7 @@ func (s *Skywalker) MigrateUp(dsn string) error {
 }
 
 func (s *Skywalker) MigrateDownAll(dsn string) error {
-	m, err := migrate.New("file://" + s.RootPath + "/migrations", dsn)
+	m, err := migrate.New(s.migrationSourceURL(), dsn)
 	if err != nil {
 		return err
 	}
@@ -40,7 +47,7 @@ func (s *Skywalker) MigrateDownAll(dsn string) error {
 }
 
 func (s *Skywalker) Steps(n int, dsn string) error {
-	m, err := migrate.New("file://" + s.RootPath + "/migrations", dsn)
+	m, err := migrate.New(s.migrationSourceURL(), dsn)
 	if err != nil {
 		return err
 	}
@@ -54,7 +61,7 @@ func (s *Skywalker) Steps(n int, dsn string) error {
 }
 
 func (s *Skywalker) MigrateForce(dsn string) error {
-	m, err := migrate.New("file://" + s.RootPath + "/migrations", dsn)
+	m, err := migrate.New(s.migrationSourceURL(), dsn)
 	if err != nil {
 		return err
 	}
