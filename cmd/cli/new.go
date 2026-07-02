@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/exec"
@@ -44,6 +43,14 @@ func doNew(appName string) {
 		exitGracefully(err)
 	}
 
+	// remove any vendor directory from the skeleton; it would be
+	// inconsistent with the rewritten go.mod. go mod tidy (below) resolves
+	// dependencies in module mode, and `go mod vendor` can recreate it.
+	err = os.RemoveAll(fmt.Sprintf("./%s/vendor", appName))
+	if err != nil {
+		exitGracefully(err)
+	}
+
 	// create a ready to go .env file
 	color.Yellow("\tCreating .env file...")
 	data, err := templateFS.ReadFile("templates/env.txt")
@@ -60,38 +67,20 @@ func doNew(appName string) {
 		exitGracefully(err)
 	}
 
-	// create a makefile
+	// create a makefile: if the skeleton ships a platform-specific Makefile,
+	// copy it over Makefile; otherwise keep the skeleton's Makefile as-is
+	platformMakefile := fmt.Sprintf("./%s/Makefile.mac", appName)
 	if runtime.GOOS == "windows" {
-		source, err := os.Open(fmt.Sprintf("./%s/Makefile", appName))
-		if err != nil {
-			exitGracefully(err)
-		}
-		defer source.Close()
+		platformMakefile = fmt.Sprintf("./%s/Makefile.windows", appName)
+	}
 
-		destination, err := os.Create(fmt.Sprintf("./%s/Makefile", appName))
+	if fileExists(platformMakefile) {
+		data, err := os.ReadFile(platformMakefile)
 		if err != nil {
 			exitGracefully(err)
 		}
-		defer destination.Close()
 
-		_, err = io.Copy(destination, source)
-		if err != nil {
-			exitGracefully(err)
-		}
-	} else {
-		source, err := os.Open(fmt.Sprintf("./%s/Makefile.mac", appName))
-		if err != nil {
-			exitGracefully(err)
-		}
-		defer source.Close()
-
-		destination, err := os.Create(fmt.Sprintf("./%s/Makefile", appName))
-		if err != nil {
-			exitGracefully(err)
-		}
-		defer destination.Close()
-
-		_, err = io.Copy(destination, source)
+		err = copyDataToFile(data, fmt.Sprintf("./%s/Makefile", appName))
 		if err != nil {
 			exitGracefully(err)
 		}
@@ -124,7 +113,9 @@ func doNew(appName string) {
 	// run go mod tidy in the project directory
 	color.Yellow("\tRunning go mod tidy...")
 	cmd := exec.Command("go", "mod", "tidy")
-	err = cmd.Start()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
 	if err != nil {
 		exitGracefully(err)
 	}

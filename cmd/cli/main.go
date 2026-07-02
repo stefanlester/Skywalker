@@ -90,6 +90,7 @@ func exitGracefully(err error, msg ...string) {
 
 	if err != nil {
 		color.Red("Error: %v\n", err)
+		os.Exit(1)
 	}
 
 	if len(message) > 0 {
