@@ -6,6 +6,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"io"
+	"math/big"
 	"os"
 )
 
@@ -13,14 +14,15 @@ const (
 	randomString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 )
 
-// gnerates a random string length n from values in the const randomString
+// RandomString generates a random string of length n from values in the
+// const randomString, drawing each character uniformly via crypto/rand.
 func (c *Skywalker) RandomString(n int) string {
 	s, r := make([]rune, n), []rune(randomString)
 
+	max := big.NewInt(int64(len(r)))
 	for i := range s {
-		p, _ := rand.Prime(rand.Reader, len(r))
-		x, y := p.Uint64(), uint64(len(r))
-		s[i] = r[x%y]
+		x, _ := rand.Int(rand.Reader, max)
+		s[i] = r[x.Int64()]
 	}
 
 	return string(s)
