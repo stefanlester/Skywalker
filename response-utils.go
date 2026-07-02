@@ -29,9 +29,9 @@ func (s *Skywalker) ReadJSON(w http.ResponseWriter, r *http.Request, data interf
 	return nil
 }
 
-// WriteJSON writes json from arbitrary data
+// WriteJSON writes compact json from arbitrary data
 func (s *Skywalker) WriteJSON(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
-	out, err := json.MarshalIndent(data, "", "\t")
+	out, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
@@ -51,9 +51,9 @@ func (s *Skywalker) WriteJSON(w http.ResponseWriter, status int, data interface{
 	return nil
 }
 
-// WriteXML writes xml from arbitrary data
+// WriteXML writes compact xml from arbitrary data
 func (s *Skywalker) WriteXML(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
-	out, err := xml.MarshalIndent(data, "", "   ")
+	out, err := xml.Marshal(data)
 	if err != nil {
 		return err
 	}
