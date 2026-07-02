@@ -1,6 +1,6 @@
 module github.com/stefanlester/skywalker
 
-go 1.18
+go 1.23.0
 
 require (
 	github.com/CloudyKit/jet/v6 v6.1.0
@@ -17,8 +17,10 @@ require (
 	github.com/justinas/nosurf v1.1.1
 	github.com/minio/minio-go/v7 v7.0.57
 	github.com/ory/dockertest/v3 v3.10.0
+	github.com/pkg/sftp v1.13.10
 	github.com/vanng822/go-premailer v1.20.2
 	github.com/xhit/go-simple-mail/v2 v2.13.0
+	golang.org/x/crypto v0.41.0
 )
 
 require (
@@ -70,6 +72,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
+	github.com/kr/fs v0.1.0 // indirect
 	github.com/lib/pq v1.10.2 // indirect
 	github.com/mailgun/mailgun-go/v4 v4.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -100,12 +103,12 @@ require (
 	github.com/yuin/gopher-lua v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
-	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/mod v0.9.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/tools v0.7.0 // indirect
+	golang.org/x/mod v0.26.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.28.0 // indirect
+	golang.org/x/tools v0.35.0 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
