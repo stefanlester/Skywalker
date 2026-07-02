@@ -74,9 +74,7 @@ func (s *WebDAV) List(prefix string) ([]filesystems.Listing, error) {
 
 	for _, x := range files {
 		if !strings.HasPrefix(x.Name(), ".") {
-			b := float64(x.Size())
-			kb := b / 1024
-			mb := kb / 1024
+			mb := filesystems.SizeToMB(x.Size())
 			item := filesystems.Listing{
 				Key:          x.Name(),
 				Size:         mb,

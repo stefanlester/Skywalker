@@ -19,3 +19,8 @@ type Listing struct {
 	Size         float64
 	IsDir        bool
 }
+
+// SizeToMB converts a size in bytes to megabytes, as reported in Listing.Size
+func SizeToMB(size int64) float64 {
+	return float64(size) / 1024 / 1024
+}

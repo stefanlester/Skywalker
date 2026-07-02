@@ -76,9 +76,7 @@ func (m *Minio) List(prefix string) ([]filesystems.Listing, error) {
 		}
 
 		if !strings.HasPrefix(object.Key, ".") {
-			b := float64(object.Size)
-			kb := b / 1024
-			mb := kb / 1024
+			mb := filesystems.SizeToMB(object.Size)
 			item := filesystems.Listing{
 				Etag:         object.ETag,
 				LastModified: object.LastModified,
