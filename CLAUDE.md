@@ -8,7 +8,7 @@ an open re-implementation in the lineage of the "Celeritas" course framework. A 
 - `skywalker.go` — core `Skywalker` type + `New()` bootstrap (loads `.env`, wires every subsystem).
 - `render/` — Jet v6 + `html/template` rendering. `session/` — scs sessions. `cache/` — Redis + Badger behind a `Cache` interface.
 - `mailer/` — queued SMTP + API mail. `urlsigner/` — signed URLs. `data/`, `driver.go`, `migrations.go` — DB (pgx/mysql) + golang-migrate.
-- `filesystems/` — `FS` interface (`Put/Get/List/Delete`) with `minio`, `s3`, `sftp`, `webdav` backends.
+- `filesystems/` — `FS` interface (`Put/Get/List/Delete`); all four backends are real: `minio`, `s3` (minio-go), `sftp` (pkg/sftp), `webdav` (gowebdav). Engine selects them via `FileSystems[fsType].(filesystems.FS)`.
 - `cmd/cli/` — scaffolder: `new`, `migrate`, `make {migration,auth,handler,model,session,mail}`; templates in `cmd/cli/templates/`.
 - `dist/myapp/` — **generated** sample app (vendored). Treat as build output, not source.
 
@@ -23,6 +23,7 @@ go build ./...        # affected module
 go vet ./...
 go test ./...         # tests live in cache, render, session, mailer
 ```
+Both modules build in **module mode** (no root `vendor/`; `go 1.23`). Pre-existing test failures in `cache`/`mailer`/`render` are env-dependent (Docker/Redis/session fixtures), not regressions.
 Host is Windows/PowerShell (Bash tool also available). Keep code cross-platform.
 
 ## Do not touch / do not search

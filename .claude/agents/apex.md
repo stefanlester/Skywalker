@@ -33,14 +33,19 @@ Two repositories, both checked out locally and both in scope:
 
 `main.go` → `initApplication()` → `routes.go`. Handlers in `handlers/handlers.go`: `Home`, `ListFS`, `UploadToFS`, `PostUploadToFS`, `getFileToUpload`, `DeleteFromFS`. Views are Jet templates in `views/` (`home.jet`, `upload.jet`, `list-fs.jet`, `layouts/base.jet`).
 
-## Known state & gaps (verify before trusting — this reflects a snapshot)
+## Current state (updated 2026-07-02 — trust but re-verify with `git log`)
 
-1. **Route/handler drift (engine).** `handlers.go` implements `UploadToFS`/`PostUploadToFS`/`DeleteFromFS` and redirects to `/files/upload?type=...`, but `routes.go` only wires `/`, `/list-fs`, and an ad-hoc `/test-minio`. The upload & delete routes are not mounted — the FS demo is half-wired.
-2. **Only MINIO is instantiated.** `createFileSystems()` in `skywalker.go` builds MINIO only; S3/SFTP/WebDAV implementations exist but are never constructed or selectable in the demo. The `ListFS`/`DeleteFromFS` switch statements only have a `MINIO` case.
-3. **Secrets & data committed in `skywalker_engine`.** `.env`, private keys under `db-data/home/` (`id_rsa`, `id_ed25519`, `id_ecdsa`), and live `db-data/` (postgres + minio) are tracked. This is a security and hygiene problem — treat as P0 if asked to harden.
-4. **Docs are a stub.** Both READMEs are a paragraph; `README.md` promises "Proper Documentation … May 2024" (overdue). No `CLAUDE.md` historically.
-5. **Module declares `go 1.18`** while modern toolchains are installed — a deliberate, low-risk modernization target.
-6. Baseline is healthy: `go build ./...` and `go vet` pass on the framework as of last check.
+Completed and committed:
+1. **FS demo routes are wired.** `routes.go` mounts `GET`+`POST /files/upload` and `GET /delete-from-fs`; upload/list/delete works end to end.
+2. **All four filesystem backends are real and selectable.** `createFileSystems()` builds MINIO/S3/SFTP/WEBDAV conditionally on env, each stored as a **pointer** satisfying `filesystems.FS`. The engine handlers use one generic lookup — `fs, ok := h.App.FileSystems[fsType].(filesystems.FS)` — **not** a per-backend switch (do not re-report a "MINIO-only switch"; it no longer exists). S3 via `minio-go`, SFTP via `pkg/sftp`, WebDAV via `studio-b12/gowebdav`. SFTP/WebDAV are compile-and-wire verified but not exercised against live servers.
+3. **Module mode + Go 1.23.** The root `vendor/` dirs were dropped (gitignored `/vendor/`); both modules build from the module cache; the `go` directive is `1.23.0`. `dist/myapp/vendor/**` (generated) remains and is untouched.
+4. **Run skill.** `skywalker_engine/.claude/skills/run-skywalker-engine/` (`smoke.sh`) builds/launches/curl-probes the app — use it to confirm the engine still boots after a change.
+
+Open items:
+1. **Secrets remain in git history.** `.env` + `db-data/home/` private keys were untracked and gitignored, but are still in history — rotation and any history scrub (filter-repo/BFG) are the user's manual task. Never re-propagate.
+2. **SFTP host-key check is `InsecureIgnoreHostKey`** (fine for the demo) — production should verify via `known_hosts`.
+3. **No tests cover `filesystems/`.** Pre-existing env-dependent failures in `cache`/`mailer`/`render` (Docker/Redis/session fixtures) are NOT regressions — always distinguish them from anything you introduce.
+4. **Docs are still thin** (framework README is a paragraph).
 
 ## How you work (operating principles)
 
