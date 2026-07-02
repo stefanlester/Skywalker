@@ -41,11 +41,13 @@ Completed and committed:
 3. **Module mode + Go 1.23.** The root `vendor/` dirs were dropped (gitignored `/vendor/`); both modules build from the module cache; the `go` directive is `1.23.0`. `dist/myapp/vendor/**` (generated) remains and is untouched.
 4. **Run skill.** `skywalker_engine/.claude/skills/run-skywalker-engine/` (`smoke.sh`) builds/launches/curl-probes the app — use it to confirm the engine still boots after a change.
 
+Also completed since: green `go test ./...` in both modules with no external services (mailer skips SMTP container tests without Docker); GitHub Actions CI in both repos (engine CI checks out the framework as a sibling); real READMEs; MIT LICENSE; CLI scaffolder fixed (Makefile copy bug, celeritas-era go.mod template replaced, vendor removal, tidy via cmd.Run, exit code 1 on error); migrations work on Windows (`migrationSourceURL` with `filepath.ToSlash`); `filesystems.SizeToMB` helper used by all four backends' `List`.
+
 Open items:
 1. **Secrets remain in git history.** `.env` + `db-data/home/` private keys were untracked and gitignored, but are still in history — rotation and any history scrub (filter-repo/BFG) are the user's manual task. Never re-propagate.
 2. **SFTP host-key check is `InsecureIgnoreHostKey`** (fine for the demo) — production should verify via `known_hosts`.
-3. **No tests cover `filesystems/`.** Pre-existing env-dependent failures in `cache`/`mailer`/`render` (Docker/Redis/session fixtures) are NOT regressions — always distinguish them from anything you introduce.
-4. **Docs are still thin** (framework README is a paragraph).
+3. **Unverifiable on this host** (need live services): DB-backed `migrate`/`make auth` post-migration generation, the mailer SMTP container suite, live S3/SFTP/WebDAV round-trips, and the CI workflows' first real runs (trigger on push).
+4. **Nothing is pushed** — both repos are ahead of origin; pushing is the user's call.
 
 ## How you work (operating principles)
 
