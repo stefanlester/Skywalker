@@ -114,12 +114,19 @@ if ok {
 
 | Backend | Library | Key env vars |
 |---|---|---|
-| MinIO | minio-go | `MINIO_ENDPOINT`, `MINIO_KEY`, `MINIO_SECRET`, `MINIO_BUCKET`, `MINIO_USESSL`, `MINIO_REGION` |
+| MinIO (any S3-compatible store) | minio-go | `MINIO_ENDPOINT`, `MINIO_KEY`, `MINIO_SECRET`, `MINIO_BUCKET`, `MINIO_USESSL`, `MINIO_REGION` |
 | S3 | minio-go (S3-compatible) | `S3_ENDPOINT`, `S3_KEY`, `S3_SECRET`, `S3_REGION`, `S3_BUCKET` |
 | SFTP | pkg/sftp | `SFTP_HOST`, `SFTP_USER`, `SFTP_PASS`, `SFTP_PORT` |
 | WebDAV | studio-b12/gowebdav | `WEBDAV_HOST`, `WEBDAV_USER`, `WEBDAV_PASS` |
 
 > SFTP currently uses `InsecureIgnoreHostKey`; verify host keys via `known_hosts` before production use.
+
+> **Note on MinIO:** the MinIO *server* community edition is [no longer maintained upstream](https://github.com/minio/minio)
+> (source-only, steered toward commercial AIStor). Skywalker is unaffected in code: both S3-family backends
+> use the still-maintained [minio-go](https://github.com/minio/minio-go) client and speak the standard S3
+> protocol, so they work with any S3-compatible server — [SeaweedFS](https://github.com/seaweedfs/seaweedfs)
+> (the dev default bundled with the skeleton, verified end-to-end), [Garage](https://garagehq.deuxfleurs.fr/),
+> Cloudflare R2, AWS S3, or an existing MinIO deployment.
 
 ## CLI reference
 

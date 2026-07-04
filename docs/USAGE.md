@@ -190,6 +190,11 @@ ok   = fs.Delete([]string{"reports/report.pdf"})
 `Listing.Size` is in megabytes (`filesystems.SizeToMB`). See the engine's upload/list/delete
 handlers for a complete worked example.
 
+The `MINIO` backend speaks the standard S3 protocol via the actively maintained minio-go client,
+so it works with **any S3-compatible server**: SeaweedFS (the skeleton's bundled dev default),
+Garage, Cloudflare R2, AWS S3, or an existing MinIO deployment. (The MinIO server community
+edition itself is no longer maintained upstream — hence SeaweedFS as the bundled default.)
+
 ## 10. Encryption, signed URLs, JSON APIs
 
 ```go
