@@ -51,9 +51,11 @@ func (s *S3) Put(fileName, folder string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	objectName := path.Base(fileName)
+	// build the object key without a leading slash: spec-correct S3 servers
+	// (AWS, SeaweedFS, Garage) treat "/name" and "name" as different keys
+	objectKey := strings.TrimPrefix(path.Join(folder, path.Base(fileName)), "/")
 	client := s.getCredentials()
-	uploadInfo, err := client.FPutObject(ctx, s.Bucket, fmt.Sprintf("%s/%s", folder, objectName), fileName, minio.PutObjectOptions{})
+	uploadInfo, err := client.FPutObject(ctx, s.Bucket, objectKey, fileName, minio.PutObjectOptions{})
 	if err != nil {
 		log.Println("Failed with FPutObject")
 		log.Println(err)
@@ -74,8 +76,10 @@ func (s *S3) List(prefix string) ([]filesystems.Listing, error) {
 
 	client := s.getCredentials()
 
+	// object keys never start with "/"; a root listing on a spec-correct
+	// S3 server needs an empty prefix, not "/"
 	objectCh := client.ListObjects(ctx, s.Bucket, minio.ListObjectsOptions{
-		Prefix:    prefix,
+		Prefix:    strings.TrimPrefix(prefix, "/"),
 		Recursive: true,
 	})
 
