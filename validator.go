@@ -2,12 +2,12 @@ package skywalker
 
 import (
 	"net/http"
+	"net/mail"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/asaskevich/govalidator"
+	"unicode"
 )
 
 type Validation struct {
@@ -56,7 +56,7 @@ func (v *Validation) Check(ok bool, key, message string) {
 }
 
 func (v *Validation) IsEmail(field, value string) {
-	if !govalidator.IsEmail(value) {
+	if _, err := mail.ParseAddress(value); err != nil {
 		v.AddError(field, "Invalid email address")
 	}
 }
@@ -83,7 +83,10 @@ func (v *Validation) IsDateISO(field, value string) {
 }
 
 func (v *Validation) NoSpaces(field, value string) {
-	if govalidator.HasWhitespace(value) {
-		v.AddError(field, "Spaces are not permitted")
+	for _, r := range value {
+		if unicode.IsSpace(r) {
+			v.AddError(field, "Spaces are not permitted")
+			return
+		}
 	}
 }
