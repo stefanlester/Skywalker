@@ -198,7 +198,8 @@ edition itself is no longer maintained upstream — hence SeaweedFS as the bundl
 ## 10. Encryption, signed URLs, JSON APIs
 
 ```go
-// AES encryption using the 32-char KEY from .env
+// authenticated AES-GCM encryption using the 32-char KEY from .env
+// (tamper-proof: Decrypt errors on any modified or wrong-key ciphertext)
 enc := skywalker.Encryption{Key: []byte(app.EncryptionKey)}
 c, _ := enc.Encrypt("secret")
 p, _ := enc.Decrypt(c)

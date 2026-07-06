@@ -23,7 +23,7 @@ go build ./...        # affected module
 go vet ./...
 go test ./...         # tests live in cache, render, session, mailer
 ```
-Both modules build in **module mode** (no root `vendor/`; `go 1.23`). Pre-existing test failures in `cache`/`mailer`/`render` are env-dependent (Docker/Redis/session fixtures), not regressions.
+Both modules build in **module mode** (no root `vendor/`; `go 1.25`). Redis via go-redis v9, Badger v4, pgx v5, AES-GCM encryption. Pre-existing test failures in `cache`/`mailer`/`render` are env-dependent (Docker/Redis/session fixtures), not regressions.
 Host is Windows/PowerShell (Bash tool also available). Keep code cross-platform.
 
 ## Do not touch / do not search

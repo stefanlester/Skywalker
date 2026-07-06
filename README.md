@@ -33,7 +33,7 @@ func main() {
 
 ## Requirements
 
-- **Go 1.23+** (both this module and generated apps build in module mode — no vendoring).
+- **Go 1.25+** (both this module and generated apps build in module mode — no vendoring).
 - Optional, depending on which subsystems you enable: Postgres/MySQL, Redis, an SMTP server, and a
   MinIO/S3/SFTP/WebDAV endpoint.
 
