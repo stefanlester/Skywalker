@@ -4,11 +4,10 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/dgraph-io/badger/v3"
-	"github.com/gomodule/redigo/redis"
+	"github.com/dgraph-io/badger/v4"
+	"github.com/redis/go-redis/v9"
 )
 
 var testRedisCache RedisCache
@@ -21,16 +20,11 @@ func TestMain(m *testing.M) {
 	}
 	defer s.Close()
 
-	pool := redis.Pool {
-		MaxIdle: 50,
-		MaxActive: 1000,
-		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", s.Addr())
-		},
-	}
+	client := redis.NewClient(&redis.Options{
+		Addr: s.Addr(),
+	})
 
-	testRedisCache.Conn = &pool
+	testRedisCache.Conn = client
 	testRedisCache.Prefix = "test-celeritas"
 
 	defer testRedisCache.Conn.Close()

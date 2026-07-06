@@ -11,10 +11,10 @@ import (
 
 	"github.com/CloudyKit/jet/v6"
 	"github.com/alexedwards/scs/v2"
-	"github.com/dgraph-io/badger/v3"
+	"github.com/dgraph-io/badger/v4"
 	"github.com/go-chi/chi/v5"
-	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
+	"github.com/redis/go-redis/v9"
 	"github.com/robfig/cron/v3"
 	"github.com/stefanlester/skywalker/cache"
 	"github.com/stefanlester/skywalker/filesystems/miniofilesystem"
@@ -30,7 +30,7 @@ const version = "1.0.0"
 
 var myRedisCache *cache.RedisCache
 var myBadgerCache *cache.BadgerCache
-var redisPool *redis.Pool
+var redisClient *redis.Client
 var badgerConn *badger.DB
 
 // Skywalker is the overall type for the Skywalker package. Members that are exported in this type are
@@ -120,7 +120,7 @@ func (s *Skywalker) New(rootPath string) error {
 	if os.Getenv("CACHE") == "redis" || os.Getenv("SESSION_TYPE") == "redis" {
 		myRedisCache = s.createClientRedisCache()
 		s.Cache = myRedisCache
-		redisPool = myRedisCache.Conn
+		redisClient = myRedisCache.Conn
 	}
 
 	if os.Getenv("CACHE") == "badger" {
@@ -189,7 +189,7 @@ func (s *Skywalker) New(rootPath string) error {
 
 	switch s.config.sessionType {
 	case "redis":
-		session.RedisPool = myRedisCache.Conn
+		session.RedisClient = myRedisCache.Conn
 	case "mysql", "postgres", "mariadb", "postgresql":
 		session.DBPool = s.DB.Pool
 	}
@@ -230,23 +230,27 @@ func (s *Skywalker) Init(p initPaths) error {
 	return nil
 }
 
-// ListenAndServe starts the web server
+// ListenAndServe starts the web server. WriteTimeout is 30s to match
+// ReadTimeout: a single request/response cycle should never take minutes, and
+// a short write timeout stops slow or stalled clients from pinning handler
+// goroutines. IdleTimeout is 120s so idle keep-alive connections outlive the
+// per-request timeouts and can be reused across many requests.
 func (s *Skywalker) ListenAndServe() {
 	serve := &http.Server{
 		Addr:         fmt.Sprintf(":%s", os.Getenv("PORT")),
 		ErrorLog:     s.ErrorLog,
 		Handler:      s.Routes,
-		IdleTimeout:  30 * time.Second,
+		IdleTimeout:  120 * time.Second,
 		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 600 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
 
 	if s.DB.Pool != nil {
 		defer s.DB.Pool.Close()
 	}
 
-	if redisPool != nil {
-		defer redisPool.Close()
+	if redisClient != nil {
+		defer redisClient.Close()
 	}
 
 	if badgerConn != nil {
@@ -312,7 +316,7 @@ func (s *Skywalker) createMailer() mailer.Mail {
 
 func (s *Skywalker) createClientRedisCache() *cache.RedisCache {
 	cacheClient := cache.RedisCache{
-		Conn:   s.createRedisPool(),
+		Conn:   s.createRedisClient(),
 		Prefix: s.config.redis.prefix,
 	}
 	return &cacheClient
@@ -325,22 +329,13 @@ func (s *Skywalker) createClientBadgerCache() *cache.BadgerCache {
 	return &cacheClient
 }
 
-func (s *Skywalker) createRedisPool() *redis.Pool {
-	return &redis.Pool{
-		MaxIdle:     50,
-		MaxActive:   10000,
-		IdleTimeout: 240 * time.Second,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp",
-				s.config.redis.host,
-				redis.DialPassword(s.config.redis.password))
-		},
-
-		TestOnBorrow: func(conn redis.Conn, t time.Time) error {
-			_, err := conn.Do("PING")
-			return err
-		},
-	}
+func (s *Skywalker) createRedisClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
+		Addr:            s.config.redis.host,
+		Password:        s.config.redis.password,
+		PoolSize:        50,
+		ConnMaxIdleTime: 240 * time.Second,
+	})
 }
 
 func (s *Skywalker) createBadgerConn() *badger.DB {

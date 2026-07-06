@@ -1,7 +1,6 @@
 package skywalker
 
 import (
-	"fmt"
 	"regexp"
 	"runtime"
 	"time"
@@ -16,5 +15,5 @@ func (s *Skywalker) LoadTime(start time.Time) {
 	runtimeFunc := regexp.MustCompile(`^.*\.(.*)$`)
 	name := runtimeFunc.ReplaceAllString(funcObj.Name(), "$1")
 
-	s.InfoLog.Printf(fmt.Sprintf("Load Time: %s took %s", name, elapsed))
+	s.InfoLog.Printf("Load Time: %s took %s", name, elapsed)
 }

@@ -2,10 +2,12 @@ package cache
 
 import (
 	"bytes"
+	"context"
 	"encoding/gob"
 	"fmt"
+	"time"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 type Cache interface {
@@ -18,7 +20,7 @@ type Cache interface {
 }
 
 type RedisCache struct {
-	Conn   *redis.Pool
+	Conn   *redis.Client
 	Prefix string
 }
 
@@ -26,15 +28,13 @@ type Entry map[string]interface{}
 
 func (c *RedisCache) Has(str string) (bool, error) {
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
-	ok, err := redis.Bool(conn.Do("EXISTS", key))
+	n, err := c.Conn.Exists(context.Background(), key).Result()
 	if err != nil {
 		return false, err
 	}
 
-	return ok, nil
+	return n > 0, nil
 }
 
 func encode(item Entry) ([]byte, error) {
@@ -61,15 +61,13 @@ func decode(str string) (Entry, error) {
 
 func (c *RedisCache) Get(str string) (interface{}, error) {
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
-	cacheEntry, err := redis.Bytes(conn.Do("GET", key))
+	cacheEntry, err := c.Conn.Get(context.Background(), key).Result()
 	if err != nil {
 		return nil, err
 	}
 
-	decoded, err := decode(string(cacheEntry))
+	decoded, err := decode(cacheEntry)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +79,6 @@ func (c *RedisCache) Get(str string) (interface{}, error) {
 
 func (c *RedisCache) Set(str string, value interface{}, expires ...int) error {
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
 	entry := Entry{}
 	entry[key] = value
@@ -91,38 +87,22 @@ func (c *RedisCache) Set(str string, value interface{}, expires ...int) error {
 		return err
 	}
 
+	var expiration time.Duration
 	if len(expires) > 0 {
-		_, err := conn.Do("SETEX", key, expires[0], string(encoded))
-		if err != nil {
-			return err
-		}
-	} else {
-		_, err := conn.Do("SET", key, string(encoded))
-		if err != nil {
-			return err
-		}
+		expiration = time.Duration(expires[0]) * time.Second
 	}
 
-	return nil
+	return c.Conn.Set(context.Background(), key, string(encoded), expiration).Err()
 }
 
 func (c *RedisCache) Forget(str string) error {
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
-	_, err := conn.Do("DEL", key)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return c.Conn.Del(context.Background(), key).Err()
 }
 
 func (c *RedisCache) EmptyByMatch(str string) error {
 	key := fmt.Sprintf("%s:%s", c.Prefix, str)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
 	keys, err := c.getKeys(key)
 	if err != nil {
@@ -130,7 +110,7 @@ func (c *RedisCache) EmptyByMatch(str string) error {
 	}
 
 	for _, x := range keys {
-		_, err := conn.Do("DEL", x)
+		err := c.Conn.Del(context.Background(), x).Err()
 		if err != nil {
 			return err
 		}
@@ -141,8 +121,6 @@ func (c *RedisCache) EmptyByMatch(str string) error {
 
 func (c *RedisCache) Empty() error {
 	key := fmt.Sprintf("%s:", c.Prefix)
-	conn := c.Conn.Get()
-	defer conn.Close()
 
 	keys, err := c.getKeys(key)
 	if err != nil {
@@ -150,7 +128,7 @@ func (c *RedisCache) Empty() error {
 	}
 
 	for _, x := range keys {
-		_, err := conn.Do("DEL", x)
+		err := c.Conn.Del(context.Background(), x).Err()
 		if err != nil {
 			return err
 		}
@@ -160,25 +138,15 @@ func (c *RedisCache) Empty() error {
 }
 
 func (c *RedisCache) getKeys(pattern string) ([]string, error) {
-	conn := c.Conn.Get()
-	defer conn.Close()
-
-	iter := 0
+	ctx := context.Background()
 	keys := []string{}
 
-	for {
-		arr, err := redis.Values(conn.Do("SCAN", iter, "MATCH", fmt.Sprintf("%s*", pattern)))
-		if err != nil {
-			return keys, err
-		}
-
-		iter, _ = redis.Int(arr[0], nil)
-		k, _ := redis.Strings(arr[1], nil)
-		keys = append(keys, k...)
-
-		if iter == 0 {
-			break
-		}
+	iter := c.Conn.Scan(ctx, 0, fmt.Sprintf("%s*", pattern), 0).Iterator()
+	for iter.Next(ctx) {
+		keys = append(keys, iter.Val())
+	}
+	if err := iter.Err(); err != nil {
+		return keys, err
 	}
 
 	return keys, nil
