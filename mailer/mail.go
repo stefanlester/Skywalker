@@ -8,7 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	apimail "github.com/ainsleyclark/go-mail"
+	"github.com/ainsleyclark/go-mail/drivers"
+	apimail "github.com/ainsleyclark/go-mail/mail"
 	"github.com/vanng822/go-premailer/premailer"
 	mail "github.com/xhit/go-simple-mail/v2"
 )
@@ -103,7 +104,19 @@ func (m *Mail) SendUsingAPI(msg Message, transport string) error {
 		FromName:    msg.FromName,
 	}
 
-	driver, err := apimail.NewClient(transport, cfg)
+	var driver apimail.Mailer
+	var err error
+
+	switch transport {
+	case "mailgun":
+		driver, err = drivers.NewMailgun(cfg)
+	case "sparkpost":
+		driver, err = drivers.NewSparkPost(cfg)
+	case "sendgrid":
+		driver, err = drivers.NewSendGrid(cfg)
+	default:
+		return fmt.Errorf("unknown transport %s; only mailgun, sparkpost or sendgrid accepted", transport)
+	}
 	if err != nil {
 		return err
 	}
