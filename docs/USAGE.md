@@ -230,7 +230,8 @@ app.Scheduler.Start()
 
 ## 12. Production checklist
 
-- `DEBUG=false` — enables template caching, disables the request logger.
+- `DEBUG=false` — enables template caching, disables the request logger, and switches all logs
+  (`App.Log`, plus the `InfoLog`/`ErrorLog` bridges) to structured JSON on stdout.
 - `SECURE=true` + `COOKIE_SECURE=true` behind TLS.
 - `KEY` must be exactly 32 characters; treat `.env` as a secret (never commit it).
 - Use a persistent session store (`redis`/`postgres`/`mysql`) if you run more than one instance.

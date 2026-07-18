@@ -28,7 +28,7 @@ func main() {
 - **Mail** — a queued mailer over channels; SMTP or an API service (Mailgun / SendGrid / SparkPost).
 - **Database & migrations** — Postgres (pgx) or MySQL, with [golang-migrate](https://github.com/golang-migrate/migrate).
 - **Remote filesystems** — one `FS` interface with four real backends: **MinIO, S3, SFTP, WebDAV**.
-- **Extras** — AES encryption helpers, signed URLs, a cron scheduler, and JSON/XML response helpers.
+- **Extras** — authenticated AES-GCM encryption, HMAC-signed URLs, structured logging (`slog`: text in debug, JSON in production), a cron scheduler, and JSON/XML response helpers.
 - **CLI** — scaffolds new apps, models, handlers, migrations, auth, sessions, and mail templates.
 
 ## Requirements
