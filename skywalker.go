@@ -3,6 +3,7 @@ package skywalker
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
@@ -36,9 +37,12 @@ var badgerConn *badger.DB
 // Skywalker is the overall type for the Skywalker package. Members that are exported in this type are
 // are available to any application that uses it
 type Skywalker struct {
-	AppName       string
-	Debug         bool
-	Version       string
+	AppName string
+	Debug   bool
+	Version string
+	// Log is the structured logger for the application. InfoLog and ErrorLog
+	// are compatibility bridges that emit through the same handler.
+	Log           *slog.Logger
 	ErrorLog      *log.Logger
 	InfoLog       *log.Logger
 	RootPath      string
@@ -97,7 +101,7 @@ func (s *Skywalker) New(rootPath string) error {
 	}
 
 	// create loggers
-	infoLog, errorLog := s.startLoggers()
+	structuredLog, infoLog, errorLog := s.startLoggers()
 
 	//connect to database
 	if os.Getenv("DATABASE_TYPE") != "" {
@@ -136,6 +140,7 @@ func (s *Skywalker) New(rootPath string) error {
 		}
 	}
 
+	s.Log = structuredLog
 	s.InfoLog = infoLog
 	s.ErrorLog = errorLog
 	s.Debug, _ = strconv.ParseBool(os.Getenv("DEBUG"))
@@ -270,14 +275,24 @@ func (s *Skywalker) checkDotEnv(path string) error {
 	return nil
 }
 
-func (c *Skywalker) startLoggers() (*log.Logger, *log.Logger) {
-	var infoLog *log.Logger
-	var errorLog *log.Logger
+// startLoggers builds a single slog handler and returns the structured logger
+// plus the InfoLog/ErrorLog compatibility bridges, all of which emit through
+// that handler. With DEBUG=true it uses a human-readable text handler at debug
+// level; otherwise it emits JSON at info level for production.
+func (s *Skywalker) startLoggers() (*slog.Logger, *log.Logger, *log.Logger) {
+	var handler slog.Handler
 
-	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.Lshortfile)
-	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	if os.Getenv("DEBUG") == "true" {
+		handler = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})
+	} else {
+		handler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})
+	}
 
-	return infoLog, errorLog
+	structuredLog := slog.New(handler)
+	infoLog := slog.NewLogLogger(handler, slog.LevelInfo)
+	errorLog := slog.NewLogLogger(handler, slog.LevelError)
+
+	return structuredLog, infoLog, errorLog
 }
 
 func (s *Skywalker) createRenderer() {
